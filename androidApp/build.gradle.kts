@@ -3,6 +3,12 @@ plugins {
     alias(libs.plugins.composeCompiler)
 }
 
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-Xskip-prerelease-check")
+    }
+}
+
 android {
     namespace = "dev.mamkin.androidapp"
     compileSdk {
