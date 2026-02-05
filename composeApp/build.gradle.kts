@@ -1,11 +1,9 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.androidKmpLibrary)
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 kotlin {
@@ -18,6 +16,7 @@ kotlin {
         minSdk = 26
         namespace = "dev.mamkin.smartstep.composeapp"
         experimentalProperties["android.experimental.kmp.enableAndroidResources"] = true
+        androidResources.enable = true
     }
     
     listOf(
@@ -45,6 +44,9 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.androidx.navigation.compose)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
