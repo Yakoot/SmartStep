@@ -29,7 +29,7 @@ fun SettingsRoot(
     viewModel: SettingsViewModel = viewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-˜
+
     SettingsScreen(
         state = state,
         onAction = viewModel::onAction
