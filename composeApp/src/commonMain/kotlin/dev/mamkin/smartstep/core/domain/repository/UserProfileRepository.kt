@@ -1,7 +1,9 @@
 package dev.mamkin.smartstep.core.domain.repository
 
 import dev.mamkin.smartstep.core.domain.model.Gender
-import dev.mamkin.smartstep.core.domain.model.UnitPreference
+import dev.mamkin.smartstep.core.domain.model.HeightUnit
+import dev.mamkin.smartstep.core.domain.model.UnitSystem
+import dev.mamkin.smartstep.core.domain.model.WeightUnit
 import kotlinx.coroutines.flow.Flow
 
 interface UserProfileRepository {
@@ -14,6 +16,9 @@ interface UserProfileRepository {
     suspend fun saveGender(gender: Gender)
     fun getGender(): Flow<Gender?>
 
-    suspend fun saveUnitPreference(unit: UnitPreference)
-    fun getUnitPreference(): Flow<UnitPreference>
+    suspend fun saveUnit(unit: UnitSystem)
+    fun getUnit(): Flow<UnitSystem>
+
+    fun getHeightUnit(): Flow<HeightUnit>
+    fun getWeightUnit(): Flow<WeightUnit>
 }

@@ -6,8 +6,12 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import dev.mamkin.smartstep.core.domain.mappers.toHeightUnit
+import dev.mamkin.smartstep.core.domain.mappers.toWeightUnit
 import dev.mamkin.smartstep.core.domain.model.Gender
-import dev.mamkin.smartstep.core.domain.model.UnitPreference
+import dev.mamkin.smartstep.core.domain.model.HeightUnit
+import dev.mamkin.smartstep.core.domain.model.UnitSystem
+import dev.mamkin.smartstep.core.domain.model.WeightUnit
 import dev.mamkin.smartstep.core.domain.repository.UserProfileRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -51,15 +55,27 @@ class UserProfileRepositoryImpl (
         }
     }
 
-    override suspend fun saveUnitPreference(unit: UnitPreference) {
+    override suspend fun saveUnit(unit: UnitSystem) {
         dataStore.edit { preferences ->
-            preferences[UNIT_PREFERENCE_KEY] = unit.name
+            preferences[UNIT_SYSTEM_KEY] = unit.name
         }
     }
 
-    override fun getUnitPreference(): Flow<UnitPreference> {
+    override fun getUnit(): Flow<UnitSystem> {
         return dataStore.data.map { preferences ->
-            UnitPreference.fromName(preferences[UNIT_PREFERENCE_KEY])
+            UnitSystem.fromName(preferences[UNIT_SYSTEM_KEY])
+        }
+    }
+
+    override fun getHeightUnit(): Flow<HeightUnit> {
+        return dataStore.data.map { preferences ->
+            UnitSystem.fromName(preferences[UNIT_SYSTEM_KEY]).toHeightUnit()
+        }
+    }
+
+    override fun getWeightUnit(): Flow<WeightUnit> {
+        return dataStore.data.map { preferences ->
+            UnitSystem.fromName(preferences[UNIT_SYSTEM_KEY]).toWeightUnit()
         }
     }
 
@@ -68,6 +84,6 @@ class UserProfileRepositoryImpl (
         private val HEIGHT_KEY = intPreferencesKey("PROFILE_HEIGHT")
         private val WEIGHT_KEY = floatPreferencesKey("PROFILE_WEIGHT")
         private val GENDER_KEY = stringPreferencesKey("PROFILE_GENDER")
-        private val UNIT_PREFERENCE_KEY = stringPreferencesKey("PROFILE_UNIT_PREFERENCE")
+        private val UNIT_SYSTEM_KEY = stringPreferencesKey("PROFILE_UNIT_SYSTEM")
     }
 }
