@@ -1,6 +1,8 @@
 package dev.mamkin.smartstep.feature.settings.presentation
 
+import dev.mamkin.smartstep.core.domain.model.Gender
+
 data class SettingsState(
-    val paramOne: String = "default",
-    val paramTwo: List<String> = emptyList(),
+    val selectedGender: Gender = Gender.Female,
+    val genderDropdownExpanded: Boolean = false
 )
