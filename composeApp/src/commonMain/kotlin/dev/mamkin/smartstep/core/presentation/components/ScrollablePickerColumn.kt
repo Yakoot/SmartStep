@@ -4,13 +4,16 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -42,6 +45,7 @@ import kotlin.math.abs
 fun ScrollablePickerColumn(
     value: String,
     values: List<String>,
+    selectedValueUnitText: String? = null,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -62,7 +66,6 @@ fun ScrollablePickerColumn(
         isProgrammaticScroll = true
         listState.animateScrollToItem(selectedIndex)
         isProgrammaticScroll = false
-
     }
 
     LaunchedEffect(listState.isScrollInProgress) {
@@ -81,7 +84,23 @@ fun ScrollablePickerColumn(
                 .align(Alignment.TopStart)
                 .offset(x = 0.dp, y = itemHeight * 2)
                 .background(AppTheme.colors.backgroundTertiary)
-        )
+        ) {
+            if (selectedValueUnitText != null) {
+                Row(
+                    modifier = Modifier.matchParentSize(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Spacer(modifier = Modifier.width(44.dp))
+                    Text (
+                        text = selectedValueUnitText,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = AppTheme.colors.textPrimary
+                    )
+                }
+
+            }
+        }
         LazyColumn(
             state = listState,
             flingBehavior = snapBehavior,
@@ -92,16 +111,40 @@ fun ScrollablePickerColumn(
                 Spacer(modifier = Modifier.height(itemHeight))
             }
 
-            items(values) { value ->
-                Text(
-                    text = value,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = AppTheme.colors.textSecondary,
-                    modifier = Modifier
-                        .height(itemHeight)
-                        .wrapContentHeight(Alignment.CenterVertically),
-                    textAlign = TextAlign.Center
-                )
+            items(values) { rowValue ->
+                val textColor = if (value == rowValue) {
+                    AppTheme.colors.textPrimary
+                } else {
+                    AppTheme.colors.textSecondary
+                }
+                if (selectedValueUnitText != null) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        Text(
+                            text = rowValue,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = textColor,
+                            modifier = Modifier
+                                .height(itemHeight)
+                                .wrapContentHeight(Alignment.CenterVertically),
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.width(44.dp))
+                    }
+                } else {
+                    Text(
+                        text = rowValue,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = textColor,
+                        modifier = Modifier
+                            .height(itemHeight)
+                            .wrapContentHeight(Alignment.CenterVertically),
+                        textAlign = TextAlign.Center
+                    )
+                }
+
             }
 
             items(itemsAfter) {
@@ -125,7 +168,8 @@ fun ScrollablePickerColumnPreview() {
             ScrollablePickerColumn(
                 value = selectedValue,
                 values = (1..100).toList().map { it.toString() },
-                onValueChange = {selectedValue = it}
+                onValueChange = {selectedValue = it},
+                selectedValueUnitText = "cm"
             )
         }
 
