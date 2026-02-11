@@ -64,7 +64,7 @@ fun ScrollablePickerColumn(
     LaunchedEffect(value, values) {
         val selectedIndex = values.indexOf(value).takeIf { it >= 0 } ?: 0
         isProgrammaticScroll = true
-        listState.animateScrollToItem(selectedIndex)
+        listState.scrollToItem(selectedIndex)
         isProgrammaticScroll = false
     }
 

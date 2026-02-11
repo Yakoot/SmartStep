@@ -24,19 +24,36 @@ import dev.mamkin.smartstep.core.presentation.components.SegmentedButton
 import dev.mamkin.smartstep.core.presentation.theme.AppTheme
 import dev.mamkin.smartstep.core.presentation.theme.SmartStepTheme
 
+data class HeightPickerState(
+    val selectedHeightUnit: HeightUnit,
+    val selectedCmValue: Int,
+    val selectedFtValue: Int,
+    val selectedInchValue: Int,
+    val availableCmValues: List<Int>,
+    val availableFtValues: List<Int>,
+    val availableInchValues: List<Int>,
+)
+
+sealed interface HeightPickerAction {
+    data object Dismiss : HeightPickerAction
+    data class HeightUnitChanged(val unit: HeightUnit) : HeightPickerAction
+    data class CmValueChanged(val value: Int) : HeightPickerAction
+    data class FtValueChanged(val value: Int) : HeightPickerAction
+    data class InchValueChanged(val value: Int) : HeightPickerAction
+}
+
 @Composable
 fun HeightPickerDialog(
-    onDismiss: () -> Unit,
-    selectedHeightUnit: HeightUnit,
-    onHeightUnitChanged: (HeightUnit) -> Unit,
+    state: HeightPickerState,
+    onAction: (HeightPickerAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Dialog(
-        onDismissRequest = onDismiss
+        onDismissRequest = { onAction(HeightPickerAction.Dismiss) }
     ) {
         Surface(
             color = AppTheme.colors.backgroundSecondary,
-            modifier = Modifier.width(328.dp),
+            modifier = modifier.width(328.dp),
             shape = RoundedCornerShape(28.dp)
         ) {
             val paddingModifier = Modifier.padding(horizontal = 24.dp)
@@ -60,18 +77,20 @@ fun HeightPickerDialog(
                         .fillMaxWidth()
                         .padding(top = 16.dp),
                     options = listOf("cm", "ft/in"),
-                    selectedIndex = selectedHeightUnit.ordinal,
-                    onOptionSelected = { onHeightUnitChanged(HeightUnit.entries[it]) }
+                    selectedIndex = state.selectedHeightUnit.ordinal,
+                    onOptionSelected = { onAction(HeightPickerAction.HeightUnitChanged(HeightUnit.entries[it])) }
                 )
-                when (selectedHeightUnit) {
+                when (state.selectedHeightUnit) {
                     HeightUnit.CENTIMETER -> {
                         ScrollablePickerColumn(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(top = 28.dp),
-                            value = "175",
-                            values = (150..200).map { it.toString() },
-                            onValueChange = {}
+                            value = state.selectedCmValue.toString(),
+                            values = state.availableCmValues.map { it.toString() },
+                            onValueChange = {
+                                onAction(HeightPickerAction.CmValueChanged(it.toInt()))
+                            }
                         )
                     }
 
@@ -83,20 +102,23 @@ fun HeightPickerDialog(
                                 modifier = Modifier
                                     .weight(1f)
                                     .padding(top = 28.dp),
-                                value = "175",
                                 selectedValueUnitText = "ft",
-                                values = (150..200).map { it.toString() },
-                                onValueChange = {}
+                                value = state.selectedFtValue.toString(),
+                                values = state.availableFtValues.map { it.toString() },
+                                onValueChange = {
+                                    onAction(HeightPickerAction.FtValueChanged(it.toInt()))
+                                }
                             )
                             ScrollablePickerColumn(
                                 modifier = Modifier
                                     .weight(1f)
                                     .padding(top = 28.dp),
-                                value = "175",
                                 selectedValueUnitText = "in",
-
-                                values = (150..200).map { it.toString() },
-                                onValueChange = {}
+                                value = state.selectedInchValue.toString(),
+                                values = state.availableInchValues.map { it.toString() },
+                                onValueChange = {
+                                    onAction(HeightPickerAction.InchValueChanged(it.toInt()))
+                                }
                             )
                         }
                     }
@@ -108,12 +130,12 @@ fun HeightPickerDialog(
                 ) {
                     AppButton(
                         text = "Cancel",
-                        onClick = onDismiss,
+                        onClick = { onAction(HeightPickerAction.Dismiss) },
                         type = AppButtonType.TEXT
                     )
                     AppButton(
                         text = "Ok",
-                        onClick = onDismiss,
+                        onClick = { onAction(HeightPickerAction.Dismiss) },
                         type = AppButtonType.TEXT
                     )
                 }
@@ -127,9 +149,16 @@ fun HeightPickerDialog(
 private fun Preview() {
     SmartStepTheme {
         HeightPickerDialog(
-            selectedHeightUnit = HeightUnit.FOOT_INCH,
-            onHeightUnitChanged = {},
-            onDismiss = {}
+            state = HeightPickerState(
+                selectedHeightUnit = HeightUnit.FOOT_INCH,
+                selectedCmValue = 175,
+                selectedFtValue = 10,
+                selectedInchValue = 10,
+                availableCmValues = (150..200).toList(),
+                availableFtValues = (150..200).toList(),
+                availableInchValues = (150..200).toList(),
+            ),
+            onAction = {},
         )
     }
 }

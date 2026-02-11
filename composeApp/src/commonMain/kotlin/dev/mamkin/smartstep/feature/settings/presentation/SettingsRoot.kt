@@ -26,16 +26,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import org.koin.compose.viewmodel.koinViewModel
 import dev.mamkin.smartstep.core.presentation.components.PickerButton
 import dev.mamkin.smartstep.core.presentation.theme.AppTheme
 import dev.mamkin.smartstep.core.presentation.theme.SmartStepTheme
 import dev.mamkin.smartstep.core.presentation.theme.bodyLargeMedium
+import dev.mamkin.smartstep.core.domain.model.HeightUnit
+import dev.mamkin.smartstep.core.domain.model.WeightUnit
 import dev.mamkin.smartstep.feature.settings.presentation.components.GenderPicker
+import dev.mamkin.smartstep.feature.settings.presentation.components.HeightPickerDialog
+import dev.mamkin.smartstep.feature.settings.presentation.components.WeightPickerDialog
 
 @Composable
 fun SettingsRoot(
-    viewModel: SettingsViewModel = viewModel()
+    viewModel: SettingsViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -84,9 +88,7 @@ fun SettingsScreen(
                 contentPadding = PaddingValues(16.dp)
             ) {
                 Button(
-                    onClick = {
-
-                    },
+                    onClick = { onAction(SettingsAction.StartClicked) },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onPrimary,
@@ -145,17 +147,41 @@ fun SettingsScreen(
                     )
                     PickerButton(
                         label = "Height",
-                        text = "170 cm",
-                        onClick = {}
+                        text = state.heightPickerState.let { hp ->
+                            when (hp.selectedHeightUnit) {
+                                HeightUnit.CENTIMETER -> "${hp.selectedCmValue} cm"
+                                HeightUnit.FOOT_INCH -> "${hp.selectedFtValue}ft ${hp.selectedInchValue}in"
+                            }
+                        },
+                        onClick = { onAction(SettingsAction.HeightButtonClicked) }
                     )
                     PickerButton(
                         label = "Weight",
-                        text = "60 kg",
-                        onClick = {}
+                        text = state.weightPickerState.let { wp ->
+                            when (wp.selectedWeightUnit) {
+                                WeightUnit.KILOGRAM -> "${wp.selectedKgValue} kg"
+                                WeightUnit.POUND -> "${wp.selectedLbValue} lb"
+                            }
+                        },
+                        onClick = { onAction(SettingsAction.WeightButtonClicked) }
                     )
                 }
             }
         }
+    }
+
+    if (state.heightPickerVisible) {
+        HeightPickerDialog(
+            state = state.heightPickerState,
+            onAction = { onAction(SettingsAction.HeightPicker(it)) }
+        )
+    }
+
+    if (state.weightPickerVisible) {
+        WeightPickerDialog(
+            state = state.weightPickerState,
+            onAction = { onAction(SettingsAction.WeightPicker(it)) }
+        )
     }
 }
 
