@@ -6,8 +6,7 @@ enum class Gender {
 
     companion object {
         fun fromName(name: String?) : Gender? {
-            return runCatching { Gender.valueOf(name?.uppercase() ?: "") }
-                .getOrNull()
+            return entries.firstOrNull { it.name.equals(name, ignoreCase = true) }
         }
     }
 }

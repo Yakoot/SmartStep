@@ -20,7 +20,7 @@ import dev.mamkin.smartstep.core.presentation.theme.SmartStepTheme
 import dev.mamkin.smartstep.core.presentation.theme.bodyMediumMedium
 
 @Composable
-fun SingleChoiceSegmentedButton(
+fun SegmentedButton(
     modifier: Modifier = Modifier,
     selectedIndex: Int = 0,
     options: List<String>,
@@ -59,7 +59,7 @@ private fun SingleChoiceSegmentedButtonPreview() {
     var selectedIndex by remember { mutableIntStateOf(0) }
 
     SmartStepTheme {
-        SingleChoiceSegmentedButton(
+        SegmentedButton(
             modifier = Modifier.width(400.dp),
             options = listOf("Option 1", "Option 2"),
             selectedIndex = selectedIndex,

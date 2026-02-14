@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import dev.mamkin.smartstep.feature.settings.presentation.SettingsRoot
 
 @Composable
 fun AppNavigation() {
@@ -28,23 +29,7 @@ fun AppNavigation() {
         }
 
         composable<SmartStepGraph.ProfileSetupScreen> {
-            Scaffold (
-                modifier = Modifier.fillMaxSize(),
-                contentWindowInsets = WindowInsets.safeDrawing
-            ) { innerPadding ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.White)
-                        .padding(innerPadding)
-                ) {
-                    Text(
-                        text = "Eat the world :)",
-                        color = Color.Blue
-                    )
-                }
-            }
-
+            SettingsRoot()
         }
     }
 }
