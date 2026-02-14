@@ -51,6 +51,7 @@ kotlin {
             implementation(libs.androidx.navigation.compose)
 
             implementation(compose.material3AdaptiveNavigationSuite)
+            implementation(compose.materialIconsExtended)
 
             implementation(libs.androidx.datastore)
             implementation(libs.androidx.datastore.preferences)

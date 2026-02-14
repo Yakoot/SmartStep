@@ -11,4 +11,7 @@ sealed interface SmartStepGraph {
     @Serializable
     data object HomeScreen: SmartStepGraph
 
+    @Serializable
+    data object PersonalSettingsScreen: SmartStepGraph
+
 }

@@ -26,26 +26,33 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import org.koin.compose.viewmodel.koinViewModel
+import dev.mamkin.smartstep.core.domain.model.HeightUnit
+import dev.mamkin.smartstep.core.domain.model.WeightUnit
 import dev.mamkin.smartstep.core.presentation.components.PickerButton
 import dev.mamkin.smartstep.core.presentation.theme.AppTheme
 import dev.mamkin.smartstep.core.presentation.theme.SmartStepTheme
 import dev.mamkin.smartstep.core.presentation.theme.bodyLargeMedium
-import dev.mamkin.smartstep.core.domain.model.HeightUnit
-import dev.mamkin.smartstep.core.domain.model.WeightUnit
 import dev.mamkin.smartstep.feature.settings.presentation.components.GenderPicker
 import dev.mamkin.smartstep.feature.settings.presentation.components.HeightPickerDialog
 import dev.mamkin.smartstep.feature.settings.presentation.components.WeightPickerDialog
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun SettingsRoot(
-    viewModel: SettingsViewModel = koinViewModel()
+    viewModel: SettingsViewModel = koinViewModel(),
+    onNavigateToHome: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     SettingsScreen(
         state = state,
-        onAction = viewModel::onAction
+        onAction = { action ->
+
+            if (action == SettingsAction.SkipClicked || action == SettingsAction.StartClicked) {
+                onNavigateToHome()
+                viewModel.onAction(action)
+            } else viewModel.onAction(action)
+        }
     )
 }
 
@@ -55,7 +62,7 @@ fun SettingsScreen(
     state: SettingsState,
     onAction: (SettingsAction) -> Unit,
 ) {
-    Scaffold (
+    Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
@@ -68,7 +75,7 @@ fun SettingsScreen(
                 actions = {
                     TextButton(
                         onClick = {
-
+                            onAction(SettingsAction.SkipClicked)
                         }
                     ) {
                         Text(
@@ -84,7 +91,7 @@ fun SettingsScreen(
             )
         },
         bottomBar = {
-            BottomAppBar (
+            BottomAppBar(
                 contentPadding = PaddingValues(16.dp)
             ) {
                 Button(

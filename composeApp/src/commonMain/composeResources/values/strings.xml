@@ -1,10 +1,14 @@
 <resources>
     <string name="app_name">SmartStep</string>
+
+
     <string name="app_will_fully_close">The app will fully close and will not run in the background.</string>
     <string name="ok">Ok</string>
 
+
     <string name="motion_sensor_permission_first_denial_message">To count your steps, Smart Step needs access to your motion sensors.</string>
     <string name="allow_access">Allow access</string>
+
 
     <string name="enable_access_manually">Enable access manually</string>
     <string name="enable_access_manually_message">To track your steps, please enable the permission in your device settings.</string>
@@ -16,4 +20,10 @@
 
     <string name="background_access_recommended">Background access recommended</string>
     <string name="background_access_message">Background access helps Smart Step track your activity more reliably.</string>
+
+
+    <string name="drawer_item_step_goal">Step Goal</string>
+    <string name="drawer_item_personal_settings">Personal Settings</string>
+    <string name="drawer_item_exit">Exit</string>
+
 </resources>

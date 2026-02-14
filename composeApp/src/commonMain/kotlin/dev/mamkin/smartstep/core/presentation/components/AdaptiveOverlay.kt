@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -16,14 +17,16 @@ import dev.mamkin.smartstep.core.presentation.utils.currentDeviceConfiguration
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdaptiveOverlay(
+    sheetState: SheetState,
     onDismiss: () -> Unit,
     content: @Composable () -> Unit
 ) {
     val currentDeviceConfiguration = currentDeviceConfiguration()
 
-
     if (currentDeviceConfiguration.isMobile) {
+
         ModalBottomSheet(
+            sheetState = sheetState,
             onDismissRequest = onDismiss
         ) {
             content()

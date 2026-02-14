@@ -48,6 +48,7 @@ class SettingsViewModel(
             SettingsAction.WeightButtonClicked -> showWeightPicker()
             is SettingsAction.WeightPicker -> onWeightPickerAction(action.action)
             SettingsAction.StartClicked -> saveProfile()
+            SettingsAction.SkipClicked -> Unit
         }
     }
 
