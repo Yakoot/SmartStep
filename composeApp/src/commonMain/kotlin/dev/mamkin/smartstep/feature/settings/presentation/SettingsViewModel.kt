@@ -49,8 +49,11 @@ class SettingsViewModel(
             is SettingsAction.WeightPicker -> onWeightPickerAction(action.action)
             SettingsAction.StartClicked -> saveProfile()
             SettingsAction.SkipClicked -> Unit
+
         }
     }
+
+
 
     private suspend fun loadInitialData() {
         val gender = userProfileRepository.getGender().first()
@@ -125,6 +128,7 @@ class SettingsViewModel(
             WeightPickerAction.Dismiss -> {
                 _state.update { it.copy(weightPickerVisible = false) }
             }
+
             is WeightPickerAction.WeightUnitChanged -> {
                 _state.update {
                     val wp = it.weightPickerState
@@ -133,6 +137,7 @@ class SettingsViewModel(
                             val kg = UnitConverter.lbToKg(wp.selectedLbValue)
                             wp.copy(selectedWeightUnit = action.unit, selectedKgValue = kg)
                         }
+
                         WeightUnit.POUND -> {
                             val lb = UnitConverter.kgToLb(wp.selectedKgValue)
                             wp.copy(selectedWeightUnit = action.unit, selectedLbValue = lb)
@@ -146,18 +151,25 @@ class SettingsViewModel(
                     val updatedHeight = if (hp.selectedHeightUnit != syncedHeightUnit) {
                         when (syncedHeightUnit) {
                             HeightUnit.CENTIMETER -> {
-                                val cm = UnitConverter.ftInToCm(hp.selectedFtValue, hp.selectedInchValue)
+                                val cm =
+                                    UnitConverter.ftInToCm(hp.selectedFtValue, hp.selectedInchValue)
                                 hp.copy(selectedHeightUnit = syncedHeightUnit, selectedCmValue = cm)
                             }
+
                             HeightUnit.FOOT_INCH -> {
                                 val (ft, inch) = UnitConverter.cmToFtIn(hp.selectedCmValue)
-                                hp.copy(selectedHeightUnit = syncedHeightUnit, selectedFtValue = ft, selectedInchValue = inch)
+                                hp.copy(
+                                    selectedHeightUnit = syncedHeightUnit,
+                                    selectedFtValue = ft,
+                                    selectedInchValue = inch
+                                )
                             }
                         }
                     } else hp
                     it.copy(weightPickerState = updatedWeight, heightPickerState = updatedHeight)
                 }
             }
+
             is WeightPickerAction.KgValueChanged -> {
                 _state.update {
                     val lb = UnitConverter.kgToLb(action.value)
@@ -169,6 +181,7 @@ class SettingsViewModel(
                     )
                 }
             }
+
             is WeightPickerAction.LbValueChanged -> {
                 _state.update {
                     val kg = UnitConverter.lbToKg(action.value)
@@ -188,17 +201,24 @@ class SettingsViewModel(
             HeightPickerAction.Dismiss -> {
                 _state.update { it.copy(heightPickerVisible = false) }
             }
+
             is HeightPickerAction.HeightUnitChanged -> {
                 _state.update {
                     val hp = it.heightPickerState
                     val updatedHeight = when (action.unit) {
                         HeightUnit.CENTIMETER -> {
-                            val cm = UnitConverter.ftInToCm(hp.selectedFtValue, hp.selectedInchValue)
+                            val cm =
+                                UnitConverter.ftInToCm(hp.selectedFtValue, hp.selectedInchValue)
                             hp.copy(selectedHeightUnit = action.unit, selectedCmValue = cm)
                         }
+
                         HeightUnit.FOOT_INCH -> {
                             val (ft, inch) = UnitConverter.cmToFtIn(hp.selectedCmValue)
-                            hp.copy(selectedHeightUnit = action.unit, selectedFtValue = ft, selectedInchValue = inch)
+                            hp.copy(
+                                selectedHeightUnit = action.unit,
+                                selectedFtValue = ft,
+                                selectedInchValue = inch
+                            )
                         }
                     }
                     val syncedWeightUnit = when (action.unit) {
@@ -212,6 +232,7 @@ class SettingsViewModel(
                                 val kg = UnitConverter.lbToKg(wp.selectedLbValue)
                                 wp.copy(selectedWeightUnit = syncedWeightUnit, selectedKgValue = kg)
                             }
+
                             WeightUnit.POUND -> {
                                 val lb = UnitConverter.kgToLb(wp.selectedKgValue)
                                 wp.copy(selectedWeightUnit = syncedWeightUnit, selectedLbValue = lb)
@@ -221,6 +242,7 @@ class SettingsViewModel(
                     it.copy(heightPickerState = updatedHeight, weightPickerState = updatedWeight)
                 }
             }
+
             is HeightPickerAction.CmValueChanged -> {
                 _state.update {
                     val (ft, inch) = UnitConverter.cmToFtIn(action.value)
@@ -233,9 +255,11 @@ class SettingsViewModel(
                     )
                 }
             }
+
             is HeightPickerAction.FtValueChanged -> {
                 _state.update {
-                    val cm = UnitConverter.ftInToCm(action.value, it.heightPickerState.selectedInchValue)
+                    val cm =
+                        UnitConverter.ftInToCm(action.value, it.heightPickerState.selectedInchValue)
                     it.copy(
                         heightPickerState = it.heightPickerState.copy(
                             selectedFtValue = action.value,
@@ -244,9 +268,11 @@ class SettingsViewModel(
                     )
                 }
             }
+
             is HeightPickerAction.InchValueChanged -> {
                 _state.update {
-                    val cm = UnitConverter.ftInToCm(it.heightPickerState.selectedFtValue, action.value)
+                    val cm =
+                        UnitConverter.ftInToCm(it.heightPickerState.selectedFtValue, action.value)
                     it.copy(
                         heightPickerState = it.heightPickerState.copy(
                             selectedInchValue = action.value,

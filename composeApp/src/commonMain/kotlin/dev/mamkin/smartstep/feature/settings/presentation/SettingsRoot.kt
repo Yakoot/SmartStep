@@ -35,11 +35,10 @@ import dev.mamkin.smartstep.core.presentation.theme.bodyLargeMedium
 import dev.mamkin.smartstep.feature.settings.presentation.components.GenderPicker
 import dev.mamkin.smartstep.feature.settings.presentation.components.HeightPickerDialog
 import dev.mamkin.smartstep.feature.settings.presentation.components.WeightPickerDialog
-import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun SettingsRoot(
-    viewModel: SettingsViewModel = koinViewModel(),
+    viewModel: SettingsViewModel,
     onNavigateToHome: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()

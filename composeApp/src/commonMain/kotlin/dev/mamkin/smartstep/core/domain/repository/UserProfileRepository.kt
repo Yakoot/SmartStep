@@ -21,4 +21,8 @@ interface UserProfileRepository {
 
     fun getHeightUnit(): Flow<HeightUnit>
     fun getWeightUnit(): Flow<WeightUnit>
+
+    suspend fun setStepGoal(stepGoal: Int)
+    fun getStepGoal(): Flow<Int?>
+
 }

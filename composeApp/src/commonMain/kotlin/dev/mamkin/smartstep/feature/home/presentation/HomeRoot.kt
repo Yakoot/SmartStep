@@ -11,25 +11,28 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.mamkin.smartstep.app.navigation.SmartStepGraph
 import dev.mamkin.smartstep.app.util.requestAppExit
 import dev.mamkin.smartstep.core.presentation.components.MainTopBar
 import dev.mamkin.smartstep.core.presentation.components.dialogs.SettingsDialog
 import dev.mamkin.smartstep.core.presentation.components.layouts.AfterFirstPermissionDenialLayout
+import dev.mamkin.smartstep.core.presentation.components.layouts.BackgroundAccessRecommendedLayout
+import dev.mamkin.smartstep.core.presentation.components.layouts.ManualPermissionLayout
 import dev.mamkin.smartstep.core.presentation.theme.AppTheme
 import dev.mamkin.smartstep.core.presentation.theme.bodyLargeMedium
+import dev.mamkin.smartstep.feature.home.presentation.components.StepGoalBottomSheet
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import smartstep.composeapp.generated.resources.Res
@@ -39,7 +42,11 @@ import smartstep.composeapp.generated.resources.drawer_item_step_goal
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeRoot(onNavigate: (SmartStepGraph) -> Unit, modifier: Modifier = Modifier) {
+fun HomeRoot(
+    onNavigate: (SmartStepGraph) -> Unit,
+    viewModel: HomeViewModel,
+    modifier: Modifier = Modifier
+) {
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -48,12 +55,15 @@ fun HomeRoot(onNavigate: (SmartStepGraph) -> Unit, modifier: Modifier = Modifier
         skipPartiallyExpanded = true
     )
 
-    var shouldDisplayExitDialog by remember {
-        mutableStateOf(false)
+
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    val closeDrawerAndRun: (() -> Unit) -> () -> Unit = { action ->
+        {
+            action()
+            scope.launch { drawerState.close() }
+        }
     }
-    var shouldShowPermissionSheet by remember { mutableStateOf(true) }
-
-
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -62,61 +72,124 @@ fun HomeRoot(onNavigate: (SmartStepGraph) -> Unit, modifier: Modifier = Modifier
 
                 DrawerItem(
                     title = stringResource(Res.string.drawer_item_step_goal),
-                    color = AppTheme.colors.textPrimary
-                ) {
-                    scope.launch { drawerState.close() }
-                }
+                    color = AppTheme.colors.textPrimary,
+                    onClick = closeDrawerAndRun {
+                            viewModel.onAction(HomeAction.OnSheetTypeChanged(SheetType.STEP_GOAL))
+                        }
+                )
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
 
                 DrawerItem(
                     title = stringResource(Res.string.drawer_item_personal_settings),
-                    color = AppTheme.colors.textPrimary
-                ) {
-                    onNavigate(SmartStepGraph.PersonalSettingsScreen)
-                    scope.launch { drawerState.close() }
-                }
+                    color = AppTheme.colors.textPrimary,
+                    onClick = closeDrawerAndRun {
+//                    viewModel.onAction(HomeAction.OnSheetTypeChanged(SheetType.AFTER_FIRST_DENIAL))
+                            onNavigate(SmartStepGraph.PersonalSettingsScreen)
+                        }
+
+                )
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-                DrawerItem(title = stringResource(Res.string.drawer_item_exit)) {
-                    shouldDisplayExitDialog = true
-                    scope.launch { drawerState.close() }
-                }
+                DrawerItem(title = stringResource(Res.string.drawer_item_exit), onClick =
+                    closeDrawerAndRun {
+                        viewModel.onAction(HomeAction.OnToggleExitDialogVisibility)
+                    }
+                )
 
             }
         },
         modifier = modifier
     ) {
-        Scaffold(topBar = {
-            MainTopBar(onDrawerOpen = {
+
+        HomeScreen(
+            state = state,
+            sheetState = sheetState,
+            onDrawerOpen = {
                 scope.launch { drawerState.open() }
-            })
-        }) { paddingValues ->
-            Box(modifier = Modifier.padding(paddingValues)) {
-
-                if (shouldDisplayExitDialog)
-                    SettingsDialog(onDismiss = {
-                        shouldDisplayExitDialog = false
-                        requestAppExit()
-                    })
-
-                if (shouldShowPermissionSheet)
-                    AfterFirstPermissionDenialLayout(sheetState = sheetState, onDismiss = {
-                        scope.launch {
-                            sheetState.hide()
-                        }.invokeOnCompletion {
-                            shouldShowPermissionSheet = false
-                        }
-                    })
+            },
+            onAction = viewModel::onAction,
+            onDismiss = {
+                viewModel.onAction(HomeAction.OnSheetTypeChanged(SheetType.NONE))
             }
-        }
+        )
+
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DrawerItem(title: String, color: Color = Color.Unspecified, onClick: () -> Unit) {
+fun HomeScreen(
+    state: HomeState,
+    sheetState: SheetState,
+    onDrawerOpen: () -> Unit,
+    onDismiss: () -> Unit,
+    onAction: (HomeAction) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Scaffold(topBar = {
+        MainTopBar(onDrawerOpen = onDrawerOpen)
+    }, modifier = modifier) { paddingValues ->
+        Box(modifier = Modifier.padding(paddingValues)) {
+
+            if (state.shouldDisplayExitDialog)
+                SettingsDialog(onDismiss = {
+                    onAction(HomeAction.OnToggleExitDialogVisibility)
+                    requestAppExit()
+                })
+
+            when (state.sheetType) {
+                SheetType.NONE -> {
+                    LaunchedEffect(sheetState) {
+                        if (sheetState.isVisible) {
+                            sheetState.hide()
+                        }
+                    }
+                }
+
+                SheetType.STEP_GOAL -> {
+
+                    StepGoalBottomSheet(
+                        stepGoal = state.currentStepGoal,
+                        sheetState = sheetState,
+                        onDismiss = onDismiss,
+                        onSave = { newStepGoal ->
+                            onAction(HomeAction.OnNewStepGoalSet(newStepGoal))
+                        })
+
+                }
+
+                SheetType.AFTER_FIRST_DENIAL -> {
+                    AfterFirstPermissionDenialLayout(sheetState = sheetState, onDismiss = onDismiss)
+                }
+
+                SheetType.MANUAL_PERMISSION -> {
+                    ManualPermissionLayout(sheetState = sheetState, onDismiss = onDismiss)
+                }
+
+                SheetType.BACKGROUND_ACCESS -> {
+                    BackgroundAccessRecommendedLayout(
+                        sheetState = sheetState,
+                        onDismiss = onDismiss
+                    )
+                }
+            }
+
+
+        }
+    }
+
+}
+
+@Composable
+fun DrawerItem(
+    title: String,
+    color: Color = Color.Unspecified,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     NavigationDrawerItem(
         label = {
             Text(
@@ -127,6 +200,6 @@ fun DrawerItem(title: String, color: Color = Color.Unspecified, onClick: () -> U
         },
         selected = false,
         onClick = onClick,
-        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+        modifier = modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
     )
 }

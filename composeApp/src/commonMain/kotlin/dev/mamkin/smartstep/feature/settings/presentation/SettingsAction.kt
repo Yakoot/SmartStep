@@ -14,4 +14,6 @@ sealed interface SettingsAction {
     data class WeightPicker(val action: WeightPickerAction): SettingsAction
     data object StartClicked: SettingsAction
     data object SkipClicked: SettingsAction
+
+
 }

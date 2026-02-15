@@ -16,7 +16,7 @@ import dev.mamkin.smartstep.core.domain.repository.UserProfileRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class UserProfileRepositoryImpl (
+class UserProfileRepositoryImpl(
     private val dataStore: DataStore<Preferences>
 ) : UserProfileRepository {
     override suspend fun saveHeight(heightCm: Int) {
@@ -79,11 +79,26 @@ class UserProfileRepositoryImpl (
         }
     }
 
+    override suspend fun setStepGoal(stepGoal: Int) {
+        dataStore.edit { preferences ->
+            preferences[STEP_GOAL_KEY] = stepGoal
+        }
+    }
+
+    override fun getStepGoal(): Flow<Int?> {
+        return dataStore.data.map { preferences ->
+            preferences[STEP_GOAL_KEY]
+
+        }
+    }
+
     private companion object Keys {
 
         private val HEIGHT_KEY = intPreferencesKey("PROFILE_HEIGHT")
         private val WEIGHT_KEY = floatPreferencesKey("PROFILE_WEIGHT")
         private val GENDER_KEY = stringPreferencesKey("PROFILE_GENDER")
         private val UNIT_SYSTEM_KEY = stringPreferencesKey("PROFILE_UNIT_SYSTEM")
+
+        private val STEP_GOAL_KEY = intPreferencesKey("PROFILE_STEP_GOAL")
     }
 }

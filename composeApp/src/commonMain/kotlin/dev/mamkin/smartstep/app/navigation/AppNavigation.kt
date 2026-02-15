@@ -10,25 +10,35 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dev.mamkin.smartstep.feature.home.presentation.HomeRoot
+import dev.mamkin.smartstep.feature.home.presentation.HomeViewModel
 import dev.mamkin.smartstep.feature.settings.presentation.SettingsRoot
+import dev.mamkin.smartstep.feature.settings.presentation.SettingsViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
+
+    val settingsViewModel: SettingsViewModel = koinViewModel()
+    val homeViewModel: HomeViewModel = koinViewModel()
 
     NavHost(
         navController = navController,
         startDestination = SmartStepGraph.ProfileSetupScreen
     ) {
         composable<SmartStepGraph.HomeScreen> {
-            HomeRoot(onNavigate = { route -> navController.navigate(route)})
+            HomeRoot(
+                viewModel = homeViewModel,
+                onNavigate = { route -> navController.navigate(route) })
         }
 
         composable<SmartStepGraph.ProfileSetupScreen> {
-            SettingsRoot(onNavigateToHome = { navController.navigate(SmartStepGraph.HomeScreen) })
+            SettingsRoot(
+                viewModel = settingsViewModel,
+                onNavigateToHome = { navController.navigate(SmartStepGraph.HomeScreen) })
         }
 
-        composable<SmartStepGraph.PersonalSettingsScreen>{
+        composable<SmartStepGraph.PersonalSettingsScreen> {
             Box(Modifier.fillMaxSize().background(Color.Green))
         }
 
