@@ -9,6 +9,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import dev.mamkin.smartstep.feature.home.presentation.HomeRoot
 import dev.mamkin.smartstep.feature.settings.presentation.SettingsRoot
 
@@ -18,14 +19,18 @@ fun AppNavigation() {
 
     NavHost(
         navController = navController,
-        startDestination = SmartStepGraph.ProfileSetupScreen
+        startDestination = SmartStepGraph.ProfileSetupScreen()
     ) {
         composable<SmartStepGraph.HomeScreen> {
             HomeRoot(onNavigate = { route -> navController.navigate(route)})
         }
 
-        composable<SmartStepGraph.ProfileSetupScreen> {
-            SettingsRoot(onNavigateToHome = { navController.navigate(SmartStepGraph.HomeScreen) })
+        composable<SmartStepGraph.ProfileSetupScreen> { backStackEntry ->
+            val route = backStackEntry.toRoute<SmartStepGraph.ProfileSetupScreen>()
+            SettingsRoot(
+                onNavigateToHome = { navController.navigate(SmartStepGraph.HomeScreen) },
+                isInitialSetup = route.isInitialSetup
+            )
         }
 
         composable<SmartStepGraph.PersonalSettingsScreen>{

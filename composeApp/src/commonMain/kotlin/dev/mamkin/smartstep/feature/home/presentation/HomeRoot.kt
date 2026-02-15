@@ -79,7 +79,7 @@ fun HomeRoot(onNavigate: (SmartStepGraph) -> Unit, modifier: Modifier = Modifier
                     title = stringResource(Res.string.drawer_item_personal_settings),
                     color = AppTheme.colors.textPrimary
                 ) {
-                    onNavigate(SmartStepGraph.PersonalSettingsScreen)
+                    onNavigate(SmartStepGraph.ProfileSetupScreen(isInitialSetup = false))
                     scope.launch { drawerState.close() }
                 }
 

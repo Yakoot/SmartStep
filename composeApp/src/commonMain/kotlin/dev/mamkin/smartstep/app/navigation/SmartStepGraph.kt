@@ -6,7 +6,9 @@ import kotlinx.serialization.Serializable
 sealed interface SmartStepGraph {
 
     @Serializable
-    data object ProfileSetupScreen: SmartStepGraph
+    data class ProfileSetupScreen(
+        val isInitialSetup: Boolean = true
+    ): SmartStepGraph
 
     @Serializable
     data object HomeScreen: SmartStepGraph

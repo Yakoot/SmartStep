@@ -40,14 +40,15 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun SettingsRoot(
     viewModel: SettingsViewModel = koinViewModel(),
+    isInitialSetup: Boolean = true,
     onNavigateToHome: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     SettingsScreen(
         state = state,
+        isInitialSetup = isInitialSetup,
         onAction = { action ->
-
             if (action == SettingsAction.SkipClicked || action == SettingsAction.StartClicked) {
                 onNavigateToHome()
                 viewModel.onAction(action)
@@ -60,6 +61,7 @@ fun SettingsRoot(
 @Composable
 fun SettingsScreen(
     state: SettingsState,
+    isInitialSetup: Boolean,
     onAction: (SettingsAction) -> Unit,
 ) {
     Scaffold(
@@ -73,16 +75,18 @@ fun SettingsScreen(
                     )
                 },
                 actions = {
-                    TextButton(
-                        onClick = {
-                            onAction(SettingsAction.SkipClicked)
+                    if (isInitialSetup) {
+                        TextButton(
+                            onClick = {
+                                onAction(SettingsAction.SkipClicked)
+                            }
+                        ) {
+                            Text(
+                                text = "Skip",
+                                style = MaterialTheme.typography.bodyLargeMedium,
+                                color = MaterialTheme.colorScheme.primary
+                            )
                         }
-                    ) {
-                        Text(
-                            text = "Skip",
-                            style = MaterialTheme.typography.bodyLargeMedium,
-                            color = MaterialTheme.colorScheme.primary
-                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -104,7 +108,7 @@ fun SettingsScreen(
                     shape = RoundedCornerShape(10.dp)
                 ) {
                     Text(
-                        text = "Start",
+                        text = if (isInitialSetup) "Start" else "Save",
                         style = MaterialTheme.typography.bodyLargeMedium,
                     )
                 }
@@ -198,6 +202,7 @@ private fun Preview() {
     SmartStepTheme {
         SettingsScreen(
             state = SettingsState(),
+            isInitialSetup = true,
             onAction = {}
         )
     }
