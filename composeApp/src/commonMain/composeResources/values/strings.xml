@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SmartStep</string>
+    <string name="app_name">Smart Step</string>
 
 
     <string name="app_will_fully_close">The app will fully close and will not run in the background.</string>
@@ -26,6 +26,7 @@
     <string name="drawer_item_personal_settings">Personal Settings</string>
     <string name="drawer_item_exit">Exit</string>
 
+    <string name="steps_card_goal">/%1$d Steps</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
 

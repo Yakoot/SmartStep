@@ -1,6 +1,9 @@
 package dev.mamkin.smartstep.feature.home.presentation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -19,6 +22,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -33,6 +38,7 @@ import dev.mamkin.smartstep.core.presentation.components.layouts.ManualPermissio
 import dev.mamkin.smartstep.core.presentation.theme.AppTheme
 import dev.mamkin.smartstep.core.presentation.theme.bodyLargeMedium
 import dev.mamkin.smartstep.feature.home.presentation.components.StepGoalBottomSheet
+import dev.mamkin.smartstep.feature.home.presentation.components.StepsCard
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import smartstep.composeapp.generated.resources.Res
@@ -86,7 +92,7 @@ fun HomeRoot(
                     color = AppTheme.colors.textPrimary,
                     onClick = closeDrawerAndRun {
 //                    viewModel.onAction(HomeAction.OnSheetTypeChanged(SheetType.AFTER_FIRST_DENIAL))
-                            onNavigate(SmartStepGraph.PersonalSettingsScreen)
+                            onNavigate(SmartStepGraph.ProfileSetupScreen(isInitialSetup = false))
                         }
 
                 )
@@ -131,9 +137,18 @@ fun HomeScreen(
 ) {
     Scaffold(topBar = {
         MainTopBar(onDrawerOpen = onDrawerOpen)
-    }, modifier = modifier) { paddingValues ->
+    }, modifier = modifier,
+        containerColor = AppTheme.colors.backgroundMain
+    ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
 
+            StepsCard(
+                steps = 1000,
+                goal = 5000,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+            )
             if (state.shouldDisplayExitDialog)
                 SettingsDialog(onDismiss = {
                     onAction(HomeAction.OnToggleExitDialogVisibility)
