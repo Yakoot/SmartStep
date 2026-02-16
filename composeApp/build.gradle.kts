@@ -36,6 +36,8 @@ kotlin {
             implementation(libs.compose.uiTooling)
             implementation(libs.koin.android)
             implementation(libs.koin.androidx.compose)
+            implementation(libs.androidx.navigation3.runtime)
+            implementation(libs.androidx.navigation3.ui)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -47,8 +49,13 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
 
+            implementation(libs.jetbrains.navigation3.ui)
+
+            implementation(libs.jetbrains.lifecycle.viewmodel)
+            implementation(libs.jetbrains.lifecycle.viewmodel.compose)
+            implementation(libs.jetbrains.lifecycle.viewmodel.navigation3)
+
             implementation(libs.kotlinx.serialization.json)
-            implementation(libs.androidx.navigation.compose)
 
             implementation(compose.material3AdaptiveNavigationSuite)
             implementation(compose.materialIconsExtended)
