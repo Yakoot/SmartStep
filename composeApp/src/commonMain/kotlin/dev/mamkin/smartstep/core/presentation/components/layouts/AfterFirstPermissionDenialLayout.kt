@@ -33,6 +33,7 @@ import smartstep.composeapp.generated.resources.motion_sensor_permission_first_d
 fun AfterFirstPermissionDenialLayout(
     sheetState: SheetState,
     onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     AdaptiveOverlay(sheetState = sheetState, onDismiss = onDismiss) {
@@ -56,7 +57,7 @@ fun AfterFirstPermissionDenialLayout(
                 AppButton(
                     text = stringResource(Res.string.allow_access),
                     type = AppButtonType.FILLED,
-                    onClick = onDismiss,
+                    onClick = onConfirm,
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -71,6 +72,6 @@ fun AfterFirstPermissionDenialLayout(
 @Preview(showBackground = true)
 fun AfterFirstPermissionDenialLayoutPreview(modifier: Modifier = Modifier) {
     SmartStepTheme {
-        AfterFirstPermissionDenialLayout(sheetState = rememberModalBottomSheetState(),onDismiss = {})
+        AfterFirstPermissionDenialLayout(sheetState = rememberModalBottomSheetState(),onDismiss = {}, onConfirm = {})
     }
 }

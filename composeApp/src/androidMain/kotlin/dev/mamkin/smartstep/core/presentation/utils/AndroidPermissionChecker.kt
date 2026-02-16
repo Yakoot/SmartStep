@@ -24,5 +24,13 @@ fun Permission.toManifestPermissionCode(): String {
                 Manifest.permission.READ_EXTERNAL_STORAGE
             }
         }
+
+        Permission.PhysicalActivityMotionSensors -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                Manifest.permission.ACTIVITY_RECOGNITION
+            } else {
+           Manifest.permission.ACTIVITY_RECOGNITION
+            }
+        }
     }
 }

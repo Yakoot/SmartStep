@@ -21,13 +21,18 @@ import dev.mamkin.smartstep.core.presentation.theme.AppTheme
 import dev.mamkin.smartstep.core.presentation.theme.SmartStepTheme
 import org.jetbrains.compose.resources.stringResource
 import smartstep.composeapp.generated.resources.Res
-import smartstep.composeapp.generated.resources.allow_access
 import smartstep.composeapp.generated.resources.background_access_message
 import smartstep.composeapp.generated.resources.background_access_recommended
+import smartstep.composeapp.generated.resources.btn_continue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BackgroundAccessRecommendedLayout(sheetState: SheetState,onDismiss: () -> Unit, modifier: Modifier = Modifier) {
+fun BackgroundAccessRecommendedLayout(
+    sheetState: SheetState,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     AdaptiveOverlay(sheetState = sheetState, onDismiss = onDismiss) {
         BaseSkeleton(
             title = {
@@ -49,9 +54,9 @@ fun BackgroundAccessRecommendedLayout(sheetState: SheetState,onDismiss: () -> Un
             footer = {
 
                 AppButton(
-                    text = stringResource(Res.string.allow_access),
+                    text = stringResource(Res.string.btn_continue),
                     type = AppButtonType.FILLED,
-                    onClick = onDismiss,
+                    onClick = onConfirm,
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -66,6 +71,9 @@ fun BackgroundAccessRecommendedLayout(sheetState: SheetState,onDismiss: () -> Un
 @Preview(showBackground = true)
 fun BackgroundAccessRecommendedLayoutPreview(modifier: Modifier = Modifier) {
     SmartStepTheme {
-        BackgroundAccessRecommendedLayout(sheetState = rememberModalBottomSheetState(),onDismiss = {})
+        BackgroundAccessRecommendedLayout(
+            sheetState = rememberModalBottomSheetState(),
+            onDismiss = {},
+            onConfirm = {})
     }
 }

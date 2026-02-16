@@ -20,7 +20,7 @@
 
     <string name="background_access_recommended">Background access recommended</string>
     <string name="background_access_message">Background access helps Smart Step track your activity more reliably.</string>
-
+    <string name="btn_continue">Continue</string>
 
     <string name="drawer_item_step_goal">Step Goal</string>
     <string name="drawer_item_personal_settings">Personal Settings</string>

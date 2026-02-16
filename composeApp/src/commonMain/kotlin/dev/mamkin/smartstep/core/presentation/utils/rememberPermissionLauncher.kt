@@ -10,3 +10,4 @@ interface PermissionLauncher {
         onPermission: (IsPermissionGranted) -> Unit
     )
 }
+

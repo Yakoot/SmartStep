@@ -35,6 +35,7 @@ import smartstep.composeapp.generated.resources.open_settings
 fun ManualPermissionLayout(
     sheetState: SheetState,
     onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     AdaptiveOverlay(sheetState = sheetState, onDismiss = onDismiss) {
@@ -85,7 +86,7 @@ fun ManualPermissionLayout(
                 AppButton(
                     text = stringResource(Res.string.open_settings),
                     type = AppButtonType.FILLED,
-                    onClick = onDismiss,
+                    onClick = onConfirm,
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -100,6 +101,6 @@ fun ManualPermissionLayout(
 @Preview(showBackground = true)
 fun ManualPermissionLayoutPreview(modifier: Modifier = Modifier) {
     SmartStepTheme {
-        ManualPermissionLayout(sheetState = rememberModalBottomSheetState(), onDismiss = {})
+        ManualPermissionLayout(sheetState = rememberModalBottomSheetState(), onDismiss = {}, onConfirm = {})
     }
 }

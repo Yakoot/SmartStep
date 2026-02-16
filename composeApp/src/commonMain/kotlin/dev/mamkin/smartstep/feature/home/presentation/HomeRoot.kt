@@ -1,6 +1,5 @@
 package dev.mamkin.smartstep.feature.home.presentation
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,14 +18,17 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.mamkin.smartstep.app.navigation.SmartStepGraph
 import dev.mamkin.smartstep.app.util.requestAppExit
@@ -37,6 +39,8 @@ import dev.mamkin.smartstep.core.presentation.components.layouts.BackgroundAcces
 import dev.mamkin.smartstep.core.presentation.components.layouts.ManualPermissionLayout
 import dev.mamkin.smartstep.core.presentation.theme.AppTheme
 import dev.mamkin.smartstep.core.presentation.theme.bodyLargeMedium
+import dev.mamkin.smartstep.core.presentation.utils.Permission
+import dev.mamkin.smartstep.core.presentation.utils.rememberNewPermissionLauncher
 import dev.mamkin.smartstep.feature.home.presentation.components.StepGoalBottomSheet
 import dev.mamkin.smartstep.feature.home.presentation.components.StepsCard
 import kotlinx.coroutines.launch
@@ -56,7 +60,7 @@ fun HomeRoot(
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-
+    val lifecycleOwner = LocalLifecycleOwner.current
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
@@ -71,6 +75,62 @@ fun HomeRoot(
         }
     }
 
+    val permissionLauncherNew = rememberNewPermissionLauncher { isGranted ->
+        viewModel.onAction(HomeAction.OnNewPermissionResult(isGranted))
+    }
+
+    // 2. This effect runs ONCE to start the entire flow.
+    LaunchedEffect(Unit) {
+        viewModel.onAction(HomeAction.OnScreenVisible)
+    }
+
+    // 3. This effect OBEYS the ViewModel's command to launch the dialog.
+    LaunchedEffect(state.shouldRequestPermission) {
+        if (state.shouldRequestPermission) {
+            // The ViewModel has commanded us to ask, so we ask.
+            permissionLauncherNew.launch(Permission.PhysicalActivityMotionSensors)
+            // Tell the ViewModel we've obeyed the command.
+            viewModel.onAction(HomeAction.OnPermissionRequestLaunched(Permission.PhysicalActivityMotionSensors))
+        }
+    }
+
+    // ADD THIS NEW, CORRECT LAUNCHEDEFFECT FOR LIFECYCLE EVENTS
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                // Tell the ViewModel the app has returned to the foreground
+                viewModel.onAction(HomeAction.OnResumed)
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        // Clean up the observer when the composable is disposed
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+
+    /*   val permissionLauncher =
+            rememberPermissionLauncher(permission = Permission.PhysicalActivityMotionSensors)
+
+
+        if (state.shouldRequestPermission) {
+            viewModel.onAction(HomeAction.OnSheetTypeChanged(SheetType.MANUAL_PERMISSION))
+        }
+        LaunchedEffect(
+            lifecycleOwner,
+                    state.isPhysicalActivityPermissionGranted,
+            state.shouldRequestPermission
+        ) {
+              permissionLauncher.launch { isGranted ->
+            val ss = 123
+                }
+
+        }*/
+
+
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -80,8 +140,8 @@ fun HomeRoot(
                     title = stringResource(Res.string.drawer_item_step_goal),
                     color = AppTheme.colors.textPrimary,
                     onClick = closeDrawerAndRun {
-                            viewModel.onAction(HomeAction.OnSheetTypeChanged(SheetType.STEP_GOAL))
-                        }
+                        viewModel.onAction(HomeAction.OnSheetTypeChanged(SheetType.STEP_GOAL))
+                    }
                 )
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
@@ -91,18 +151,18 @@ fun HomeRoot(
                     title = stringResource(Res.string.drawer_item_personal_settings),
                     color = AppTheme.colors.textPrimary,
                     onClick = closeDrawerAndRun {
-//                    viewModel.onAction(HomeAction.OnSheetTypeChanged(SheetType.AFTER_FIRST_DENIAL))
-                            onNavigate(SmartStepGraph.ProfileSetupScreen(isInitialSetup = false))
-                        }
+                        onNavigate(SmartStepGraph.ProfileSetupScreen(isInitialSetup = false))
+                    }
 
                 )
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-                DrawerItem(title = stringResource(Res.string.drawer_item_exit), onClick =
-                    closeDrawerAndRun {
-                        viewModel.onAction(HomeAction.OnToggleExitDialogVisibility)
-                    }
+                DrawerItem(
+                    title = stringResource(Res.string.drawer_item_exit), onClick =
+                        closeDrawerAndRun {
+                            viewModel.onAction(HomeAction.OnToggleExitDialogVisibility)
+                        }
                 )
 
             }
@@ -135,16 +195,20 @@ fun HomeScreen(
     onAction: (HomeAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Scaffold(topBar = {
-        MainTopBar(onDrawerOpen = onDrawerOpen)
-    }, modifier = modifier,
+    Scaffold(
+        topBar = {
+            MainTopBar(onDrawerOpen = onDrawerOpen)
+        }, modifier = modifier,
         containerColor = AppTheme.colors.backgroundMain
     ) { paddingValues ->
-        Box(modifier = Modifier.padding(paddingValues)) {
+        Box(
+            modifier = Modifier.fillMaxSize().padding(paddingValues),
+            contentAlignment = Alignment.Center
+        ) {
 
             StepsCard(
                 steps = 1000,
-                goal = 5000,
+                goal = state.currentStepGoal ?: 5000,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
@@ -177,17 +241,33 @@ fun HomeScreen(
                 }
 
                 SheetType.AFTER_FIRST_DENIAL -> {
-                    AfterFirstPermissionDenialLayout(sheetState = sheetState, onDismiss = onDismiss)
+                    AfterFirstPermissionDenialLayout(
+                        sheetState = sheetState,
+                        onDismiss = onDismiss,
+                        onConfirm = {
+                            onAction(HomeAction.OnAllowAccessClick)
+                        }
+                    )
                 }
 
                 SheetType.MANUAL_PERMISSION -> {
-                    ManualPermissionLayout(sheetState = sheetState, onDismiss = onDismiss)
+                    ManualPermissionLayout(
+                        sheetState = sheetState,
+                        onDismiss = onDismiss,
+                        onConfirm = {
+                            onAction(HomeAction.OnSheetTypeChanged(SheetType.NONE))
+                            onAction(HomeAction.OnOpenAppSettingsClick)
+
+                        })
                 }
 
                 SheetType.BACKGROUND_ACCESS -> {
                     BackgroundAccessRecommendedLayout(
                         sheetState = sheetState,
-                        onDismiss = onDismiss
+                        onDismiss = onDismiss,
+                        onConfirm = {
+                            onAction(HomeAction.OnBackgroundContinueClick)
+                        }
                     )
                 }
             }

@@ -10,6 +10,7 @@ composeMultiplatform = "1.10.0"
 datastore = "1.2.0"
 datastorePreferences = "1.2.0"
 junit = "4.13.2"
+kermit = "2.0.8"
 kotlin = "2.3.0"
 material3 = "1.10.0-alpha05"
 material = "1.13.0"
@@ -26,6 +27,7 @@ androidx-lifecycle-nav3 = "2.10.0-alpha06"
 [libraries]
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
+kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 junit = { module = "junit:junit", version.ref = "junit" }
