@@ -25,4 +25,6 @@ interface UserProfileRepository {
     suspend fun setStepGoal(stepGoal: Int)
     fun getStepGoal(): Flow<Int?>
 
+    suspend fun setProfileSetupCompleted(boolean: Boolean)
+    suspend fun isProfileSetupCompleted(): Boolean
 }

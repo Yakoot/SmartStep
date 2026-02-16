@@ -14,6 +14,7 @@ import dev.mamkin.smartstep.core.domain.model.UnitSystem
 import dev.mamkin.smartstep.core.domain.model.WeightUnit
 import dev.mamkin.smartstep.core.domain.repository.UserProfileRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 class UserProfileRepositoryImpl(
@@ -92,6 +93,18 @@ class UserProfileRepositoryImpl(
         }
     }
 
+    override suspend fun setProfileSetupCompleted(boolean: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[SETUP_COMPLETED_KEY] = if (boolean) 1 else 0
+        }
+    }
+
+    override suspend fun isProfileSetupCompleted(): Boolean {
+        return dataStore.data.map { preferences ->
+            preferences[SETUP_COMPLETED_KEY] == 1
+        }.first()
+    }
+
     private companion object Keys {
 
         private val HEIGHT_KEY = intPreferencesKey("PROFILE_HEIGHT")
@@ -100,5 +113,6 @@ class UserProfileRepositoryImpl(
         private val UNIT_SYSTEM_KEY = stringPreferencesKey("PROFILE_UNIT_SYSTEM")
 
         private val STEP_GOAL_KEY = intPreferencesKey("PROFILE_STEP_GOAL")
+        private val SETUP_COMPLETED_KEY = intPreferencesKey("PROFILE_SETUP_COMPLETED")
     }
 }

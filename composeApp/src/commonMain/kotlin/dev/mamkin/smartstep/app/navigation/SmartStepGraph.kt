@@ -14,7 +14,4 @@ sealed interface SmartStepGraph: NavKey {
     @Serializable
     data object HomeScreen: SmartStepGraph
 
-    @Serializable
-    data object PersonalSettingsScreen: SmartStepGraph
-
 }

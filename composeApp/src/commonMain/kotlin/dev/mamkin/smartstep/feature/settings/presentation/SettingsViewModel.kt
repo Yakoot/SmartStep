@@ -112,6 +112,7 @@ class SettingsViewModel(
                 HeightUnit.FOOT_INCH -> UnitSystem.IMPERIAL
             }
             userProfileRepository.saveUnit(unitSystem)
+            userProfileRepository.setProfileSetupCompleted(true)
         }
     }
 

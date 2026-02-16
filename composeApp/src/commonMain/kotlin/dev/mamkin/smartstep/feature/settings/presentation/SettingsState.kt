@@ -7,6 +7,7 @@ import dev.mamkin.smartstep.feature.settings.presentation.components.HeightPicke
 import dev.mamkin.smartstep.feature.settings.presentation.components.WeightPickerState
 
 data class SettingsState(
+    val isInitialSetupCompleted: Boolean = false,
     val selectedGender: Gender = Gender.Female,
     val genderDropdownExpanded: Boolean = false,
     val heightPickerVisible: Boolean = false,

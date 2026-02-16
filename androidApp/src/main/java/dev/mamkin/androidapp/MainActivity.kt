@@ -5,17 +5,24 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.mamkin.smartstep.App
+import dev.mamkin.smartstep.app.MainViewModel
 import dev.mamkin.smartstep.core.presentation.utils.ActivityHolder
-import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
+
+    private val mainViewModel: MainViewModel by viewModel()
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
+        val splashScreen = installSplashScreen()
+        splashScreen.setKeepOnScreenCondition { !mainViewModel.isReady }
 
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -34,17 +41,10 @@ class MainActivity : ComponentActivity() {
         }
         lifecycle.addObserver(lifecycleObserver)
         setContent {
-            App(
-                platformConfiguration = {
-                    androidContext(this@MainActivity.applicationContext)
-                }
-            )
+            val initialRoute by mainViewModel.initialRoute.collectAsStateWithLifecycle()
+            initialRoute?.let {
+                App(initialRoute = it)
+            }
         }
     }
-}
-
-@Preview
-@Composable
-fun AppAndroidPreview() {
-    App()
 }
