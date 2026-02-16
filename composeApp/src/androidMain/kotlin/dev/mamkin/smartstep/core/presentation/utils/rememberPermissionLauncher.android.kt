@@ -33,38 +33,30 @@ actual fun rememberPermissionLauncher(permission: Permission): PermissionLaunche
     return remember {
         object : PermissionLauncher {
             override fun launch(onPermission: (Boolean) -> Unit) {
+                val activity = context.findActivity() ?: return
                 val manifestPermission = permission.toManifestPermissionCode()
 
                 onPermissionResult = onPermission
 
-                if (ContextCompat.checkSelfPermission(context, manifestPermission) == PackageManager.PERMISSION_GRANTED) {
-                    onPermission(true)
-                    return
-                }
+                when {
+                    ContextCompat.checkSelfPermission(
+                        context,
+                        manifestPermission
+                    ) == PackageManager.PERMISSION_GRANTED -> {
+                        onPermission(true)
+                    }
 
-                if (isPermissionPermanentlyDenied(context, manifestPermission)) {
-                    openAppSettings(context)
-                    onPermission(false)
-                } else {
-                    permissionLauncher.launch(manifestPermission)
+                    ActivityCompat.shouldShowRequestPermissionRationale(activity, manifestPermission) -> {
+                        permissionLauncher.launch(manifestPermission)
+                    }
+
+                    else -> {
+                        permissionLauncher.launch(manifestPermission)
+                    }
                 }
             }
         }
     }
-}
-
-private fun isPermissionPermanentlyDenied(context: Context, permission: String): Boolean {
-    val activity = context.findActivity() ?: return false
-
-    val isCurrentlyDenied = ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_DENIED
-    val shouldShowRationale = ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)
-
-    return isCurrentlyDenied && !shouldShowRationale && hasAskedBefore(context, permission)
-}
-
-private fun hasAskedBefore(context: Context, permission: String): Boolean {
-    val prefs = context.getSharedPreferences("permission_prefs", Context.MODE_PRIVATE)
-    return prefs.getBoolean(permission, false)
 }
 
 private fun Context.findActivity(): Activity? = when (this) {
