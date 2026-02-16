@@ -1,10 +1,10 @@
 package dev.mamkin.smartstep.core.presentation.components.layouts
 
+
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -27,20 +27,8 @@ import smartstep.composeapp.generated.resources.background_access_recommended
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BackgroundAccessRecommendedLayout(
-    sheetState: SheetState,
-    onDismiss: () -> Unit,
-    onAllowAccessClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    AdaptiveOverlay(
-        sheetState = sheetState,
-        onDismiss = onDismiss,
-        dialogProperties = ModalBottomSheetProperties(
-            shouldDismissOnClickOutside = true,
-            shouldDismissOnBackPress = true,
-        ),
-    ) {
+fun BackgroundAccessRecommendedLayout(sheetState: SheetState,onDismiss: () -> Unit, modifier: Modifier = Modifier) {
+    AdaptiveOverlay(sheetState = sheetState, onDismiss = onDismiss) {
         BaseSkeleton(
             title = {
                 Text(
@@ -59,27 +47,25 @@ fun BackgroundAccessRecommendedLayout(
                 )
             },
             footer = {
+
                 AppButton(
                     text = stringResource(Res.string.allow_access),
                     type = AppButtonType.FILLED,
-                    onClick = onAllowAccessClick,
+                    onClick = onDismiss,
                     modifier = Modifier.fillMaxWidth()
                 )
-            },
-            modifier = modifier.padding(horizontal = 16.dp)
+
+            }, modifier = modifier.padding(horizontal = 16.dp)
         )
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview(showBackground = true)
 fun BackgroundAccessRecommendedLayoutPreview(modifier: Modifier = Modifier) {
     SmartStepTheme {
-        BackgroundAccessRecommendedLayout(
-            sheetState = rememberModalBottomSheetState(),
-            onDismiss = { },
-            onAllowAccessClick = { }
-        )
+        BackgroundAccessRecommendedLayout(sheetState = rememberModalBottomSheetState(),onDismiss = {})
     }
 }

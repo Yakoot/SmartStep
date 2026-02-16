@@ -8,7 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import dev.mamkin.smartstep.App
-import dev.mamkin.smartstep.app.di.activityModule
 import org.koin.android.ext.koin.androidContext
 
 class MainActivity : ComponentActivity() {
@@ -22,7 +21,6 @@ class MainActivity : ComponentActivity() {
             App(
                 platformConfiguration = {
                     androidContext(this@MainActivity.applicationContext)
-                    modules(activityModule(this@MainActivity))
                 }
             )
         }

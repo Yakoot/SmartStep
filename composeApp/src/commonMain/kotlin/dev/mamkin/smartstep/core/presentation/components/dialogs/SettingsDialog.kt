@@ -20,7 +20,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.DialogProperties
 import dev.mamkin.smartstep.core.presentation.components.AppButton
 import dev.mamkin.smartstep.core.presentation.components.AppButtonType
 import dev.mamkin.smartstep.core.presentation.theme.AppTheme
@@ -41,10 +40,6 @@ fun SettingsDialog(onDismiss: () -> Unit, modifier: Modifier = Modifier) {
         modifier = Modifier.fillMaxWidth().wrapContentHeight().background(
             Color.White,
             RoundedCornerShape(24.dp)
-        ),
-        properties = DialogProperties(
-            dismissOnBackPress = false,
-            dismissOnClickOutside = false
         )
     ) {
 
@@ -76,6 +71,7 @@ fun SettingsDialog(onDismiss: () -> Unit, modifier: Modifier = Modifier) {
                 onClick = onDismiss,
                 modifier = Modifier.fillMaxWidth()
             )
+
         }
     }
 }
