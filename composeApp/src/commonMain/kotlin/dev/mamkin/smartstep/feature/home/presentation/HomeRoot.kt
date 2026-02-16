@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -210,7 +211,7 @@ fun HomeScreen(
                 steps = 1000,
                 goal = state.currentStepGoal ?: 5000,
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .widthIn(max = 394.dp)
                     .padding(horizontal = 16.dp)
             )
             if (state.shouldDisplayExitDialog)
