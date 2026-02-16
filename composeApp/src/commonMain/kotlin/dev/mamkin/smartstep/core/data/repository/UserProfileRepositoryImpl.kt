@@ -87,8 +87,7 @@ class UserProfileRepositoryImpl(
 
     override fun getStepGoal(): Flow<Int?> {
         return dataStore.data.map { preferences ->
-            preferences[STEP_GOAL_KEY]
-
+            preferences[STEP_GOAL_KEY] ?: 1000
         }
     }
 

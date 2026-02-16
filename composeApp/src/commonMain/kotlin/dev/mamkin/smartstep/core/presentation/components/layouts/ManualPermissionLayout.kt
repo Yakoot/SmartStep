@@ -1,11 +1,11 @@
 package dev.mamkin.smartstep.core.presentation.components.layouts
 
-
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -34,10 +34,17 @@ import smartstep.composeapp.generated.resources.open_settings
 @Composable
 fun ManualPermissionLayout(
     sheetState: SheetState,
-    onDismiss: () -> Unit,
+    onOpenSettingsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    AdaptiveOverlay(sheetState = sheetState, onDismiss = onDismiss) {
+    AdaptiveOverlay(
+        sheetState = sheetState,
+        onDismiss = { },
+        dialogProperties = ModalBottomSheetProperties(
+            shouldDismissOnClickOutside = false,
+            shouldDismissOnBackPress = false,
+        ),
+    ) {
         BaseSkeleton(
             title = {
                 Text(
@@ -85,11 +92,12 @@ fun ManualPermissionLayout(
                 AppButton(
                     text = stringResource(Res.string.open_settings),
                     type = AppButtonType.FILLED,
-                    onClick = onDismiss,
+                    onClick = onOpenSettingsClick,
                     modifier = Modifier.fillMaxWidth()
                 )
 
-            }, modifier = modifier.padding(horizontal = 16.dp)
+            },
+            modifier = modifier.padding(horizontal = 16.dp)
         )
     }
 }
@@ -98,8 +106,11 @@ fun ManualPermissionLayout(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview(showBackground = true)
-fun ManualPermissionLayoutPreview(modifier: Modifier = Modifier) {
+fun ManualPermissionLayoutPreview() {
     SmartStepTheme {
-        ManualPermissionLayout(sheetState = rememberModalBottomSheetState(), onDismiss = {})
+        ManualPermissionLayout(
+            sheetState = rememberModalBottomSheetState(),
+            onOpenSettingsClick = {}
+        )
     }
 }

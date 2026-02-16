@@ -38,6 +38,9 @@ kotlin {
             implementation(libs.koin.androidx.compose)
             implementation(libs.androidx.navigation3.runtime)
             implementation(libs.androidx.navigation3.ui)
+            implementation(libs.androidx.lifecycle.process)
+            implementation(libs.androidx.lifecycle.runtime.ktx)
+            implementation(libs.koin.android)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
