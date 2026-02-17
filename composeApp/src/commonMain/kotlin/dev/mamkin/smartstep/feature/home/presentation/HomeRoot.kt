@@ -208,7 +208,7 @@ fun HomeScreen(
         ) {
 
             StepsCard(
-                steps = 1000,
+                steps = state.currentSteps,
                 goal = state.currentStepGoal ?: 5000,
                 modifier = Modifier
                     .widthIn(max = 394.dp)

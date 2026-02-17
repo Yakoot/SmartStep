@@ -3,6 +3,7 @@ package dev.mamkin.smartstep.feature.home.presentation
 data class HomeState(
     val sheetType: SheetType = SheetType.NONE,
     val shouldDisplayExitDialog: Boolean = false,
+    val currentSteps: Int = 0,
     val currentStepGoal : Int? = null,
     val isPhysicalActivityPermissionGranted: Boolean = false,
     val shouldRequestPermission: Boolean = false

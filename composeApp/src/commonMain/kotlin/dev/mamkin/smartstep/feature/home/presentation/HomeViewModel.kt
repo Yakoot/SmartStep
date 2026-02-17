@@ -8,17 +8,20 @@ import dev.mamkin.smartstep.core.presentation.utils.Permission
 import dev.mamkin.smartstep.core.presentation.utils.PermissionManager
 import dev.mamkin.smartstep.core.presentation.utils.PermissionStatus
 import dev.mamkin.smartstep.core.presentation.utils.PlatformActionManager
+import dev.mamkin.smartstep.feature.home.domain.repository.StepTrackerRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.JsonPrimitive
 
 class HomeViewModel(
     private val userProfileRepository: UserProfileRepository,
     private val permissionManager: PermissionManager,
-    val platformActionManager: PlatformActionManager
+    val platformActionManager: PlatformActionManager,
+    private val stepTracker: StepTrackerRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeState())
@@ -26,9 +29,19 @@ class HomeViewModel(
 
     init {
         viewModelScope.launch {
-            userProfileRepository.getStepGoal().collectLatest { savedStepGoal ->
-                _state.update { currentState ->
-                    currentState.copy(currentStepGoal = savedStepGoal)
+            launch {
+                userProfileRepository.getStepGoal().collectLatest { savedStepGoal ->
+                    _state.update { currentState ->
+                        currentState.copy(currentStepGoal = savedStepGoal)
+                    }
+                }
+            }
+
+            launch {
+                stepTracker.trackSteps().collectLatest { steps ->
+                    _state.update { currentState ->
+                        currentState.copy(currentSteps = steps)
+                    }
                 }
             }
         }
