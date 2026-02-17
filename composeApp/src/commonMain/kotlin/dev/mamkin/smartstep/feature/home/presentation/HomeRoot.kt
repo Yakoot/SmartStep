@@ -26,6 +26,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -39,6 +40,7 @@ import dev.mamkin.smartstep.core.presentation.components.layouts.AfterFirstPermi
 import dev.mamkin.smartstep.core.presentation.components.layouts.BackgroundAccessRecommendedLayout
 import dev.mamkin.smartstep.core.presentation.components.layouts.ManualPermissionLayout
 import dev.mamkin.smartstep.core.presentation.theme.AppTheme
+import dev.mamkin.smartstep.core.presentation.theme.SmartStepTheme
 import dev.mamkin.smartstep.core.presentation.theme.bodyLargeMedium
 import dev.mamkin.smartstep.core.presentation.utils.Permission
 import dev.mamkin.smartstep.core.presentation.utils.rememberNewPermissionLauncher
@@ -298,4 +300,41 @@ fun DrawerItem(
         onClick = onClick,
         modifier = modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview
+@Composable
+fun HomePreview() {
+    SmartStepTheme {
+        HomeScreen(
+            state= HomeState(),
+            sheetState = rememberModalBottomSheetState(),
+            onDrawerOpen = {
+
+            },
+            onDismiss = {
+
+            },
+            onAction = {}
+        )
+    }
+}
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(widthDp = 1280)
+@Composable
+fun WideHomePreview() {
+    SmartStepTheme {
+        HomeScreen(
+            state= HomeState(),
+            sheetState = rememberModalBottomSheetState(),
+            onDrawerOpen = {
+
+            },
+            onDismiss = {
+
+            },
+            onAction = {}
+        )
+    }
 }
