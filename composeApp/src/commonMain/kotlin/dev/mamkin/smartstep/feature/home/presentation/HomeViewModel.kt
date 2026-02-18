@@ -71,7 +71,10 @@ class HomeViewModel(
     private suspend fun checkInitialPermissionStatus() {
         val status = permissionManager.getPermissionStatus(Permission.PhysicalActivityMotionSensors)
         when (status) {
-            PermissionStatus.GRANTED -> _state.update { it.copy(isPhysicalActivityPermissionGranted = true) }
+            PermissionStatus.GRANTED -> {
+                _state.update { it.copy(isPhysicalActivityPermissionGranted = true) }
+                platformActionManager.startStepTrackingService()
+            }
             PermissionStatus.NOT_DETERMINED -> _state.update { it.copy(shouldRequestPermission = true) }
             PermissionStatus.DENIED -> _state.update { it.copy(sheetType = SheetType.AFTER_FIRST_DENIAL) }
             PermissionStatus.PERMANENTLY_DENIED -> _state.update { it.copy(sheetType = SheetType.MANUAL_PERMISSION) }
@@ -81,7 +84,7 @@ class HomeViewModel(
 
     private suspend fun handlePermissionDialogResult(isGranted: Boolean) {
         if (isGranted) {
-
+            platformActionManager.startStepTrackingService()
             _state.update {
                 it.copy(
                     isPhysicalActivityPermissionGranted = true,

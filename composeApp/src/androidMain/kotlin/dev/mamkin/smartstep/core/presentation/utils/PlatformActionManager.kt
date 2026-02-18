@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import androidx.core.content.ContextCompat
+import dev.mamkin.smartstep.feature.home.service.StepTrackingService
 
 class AndroidPlatformActionManager(private val context: Context) : PlatformActionManager {
     override fun openAppSettings() {
@@ -24,5 +26,9 @@ class AndroidPlatformActionManager(private val context: Context) : PlatformActio
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         context.startActivity(intent)
+    }
+
+    override fun startStepTrackingService() {
+        ContextCompat.startForegroundService(context, StepTrackingService.startIntent(context))
     }
 }
