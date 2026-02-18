@@ -2,4 +2,5 @@
 <resources>
     <color name="buttonPrimary">#3A43B6</color>
     <color name="textPrimary">#1F2024</color>
+    <color name="backgroundMain">#E4F0FB</color>
 </resources>
