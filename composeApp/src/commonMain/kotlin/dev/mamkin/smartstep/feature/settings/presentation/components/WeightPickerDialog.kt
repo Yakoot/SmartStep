@@ -19,7 +19,7 @@ import androidx.compose.ui.window.Dialog
 import dev.mamkin.smartstep.core.domain.model.WeightUnit
 import dev.mamkin.smartstep.core.presentation.components.AppButton
 import dev.mamkin.smartstep.core.presentation.components.AppButtonType
-import dev.mamkin.smartstep.core.presentation.components.ScrollablePickerColumn
+import dev.mamkin.smartstep.core.presentation.components.pickers.ScrollablePickerColumn
 import dev.mamkin.smartstep.core.presentation.components.SegmentedButton
 import dev.mamkin.smartstep.core.presentation.theme.AppTheme
 import dev.mamkin.smartstep.core.presentation.theme.SmartStepTheme

@@ -11,7 +11,8 @@ datastore = "1.2.0"
 datastorePreferences = "1.2.0"
 junit = "4.13.2"
 kermit = "2.0.8"
-kotlin = "2.3.0"
+kotlin = "2.3.10"
+ksp = "2.3.5"
 material3 = "1.10.0-alpha05"
 material = "1.13.0"
 composeBom = "2026.01.01"
@@ -22,6 +23,8 @@ serialization = "1.10.0"
 navigation3 = "1.0.0"
 cmpNavigation3 = "1.0.0-alpha06"
 androidx-lifecycle-nav3 = "2.10.0-alpha06"
+room = "2.7.2"
+sqlite = "2.5.2"
 
 
 [libraries]
@@ -70,6 +73,11 @@ koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", ver
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
 
+# Room
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
+
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
@@ -78,6 +86,8 @@ composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "k
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 androidKmpLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 kotlinx-serialization = { id="org.jetbrains.kotlin.plugin.serialization", version.ref="kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+room = { id = "androidx.room", version.ref = "room" }
 
 [bundles]
 koinAndroid = ["koin-core", "koin-android", "koin-androidx-compose"]

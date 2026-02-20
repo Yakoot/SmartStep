@@ -20,7 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.mamkin.smartstep.core.presentation.components.AppButton
 import dev.mamkin.smartstep.core.presentation.components.AppButtonType
-import dev.mamkin.smartstep.core.presentation.components.ScrollablePickerColumn
+import dev.mamkin.smartstep.core.presentation.components.pickers.ScrollablePickerColumn
 import dev.mamkin.smartstep.core.presentation.theme.AppTheme
 import dev.mamkin.smartstep.core.presentation.theme.SmartStepTheme
 import org.jetbrains.compose.resources.stringResource

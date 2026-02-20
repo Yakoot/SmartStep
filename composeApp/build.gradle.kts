@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.androidKmpLibrary)
     alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 }
 
 kotlin {
@@ -24,8 +26,10 @@ kotlin {
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            baseName = "ComposeApp"
+            baseName = "SmartStepApp"
             isStatic = true
+
+            linkerOpts.add("-lsqlite3")
         }
     }
     
@@ -68,9 +72,18 @@ kotlin {
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.kermit)
 
-        }
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
+            implementation(libs.androidx.room.runtime)
+            implementation(libs.sqlite.bundled)
         }
     }
+}
+
+dependencies {
+    add("kspAndroid", libs.androidx.room.compiler)
+    add("kspIosSimulatorArm64", libs.androidx.room.compiler)
+    add("kspIosArm64", libs.androidx.room.compiler)
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
 }
