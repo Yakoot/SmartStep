@@ -3,5 +3,7 @@ package dev.mamkin.smartstep.feature.home.domain.repository
 import kotlinx.coroutines.flow.Flow
 
 interface StepTrackerRepository {
-    fun trackSteps() : Flow<Int>
+    suspend fun resetTodaySteps()
+    suspend fun editSteps(dateEpochMillis: Long, steps: Int)
+    fun observeSteps() : Flow<Int>
 }

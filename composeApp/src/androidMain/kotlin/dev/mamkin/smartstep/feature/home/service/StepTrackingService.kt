@@ -51,7 +51,7 @@ class StepTrackingService : Service() {
 
         if (trackingJob?.isActive != true) {
             trackingJob = serviceScope.launch {
-                stepTrackerRepository.trackSteps().collectLatest { steps ->
+                stepTrackerRepository.observeSteps().collectLatest { steps ->
                     notificationManager.notify(NOTIFICATION_ID, buildNotification(steps))
                 }
             }

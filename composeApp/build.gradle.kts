@@ -60,6 +60,7 @@ kotlin {
             implementation(libs.jetbrains.lifecycle.viewmodel.navigation3)
 
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.kotlinx.datetime)
 
             implementation(compose.material3AdaptiveNavigationSuite)
             implementation(compose.materialIconsExtended)

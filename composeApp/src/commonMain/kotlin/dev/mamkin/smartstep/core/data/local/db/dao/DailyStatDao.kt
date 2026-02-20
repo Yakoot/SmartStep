@@ -1,6 +1,8 @@
 package dev.mamkin.smartstep.core.data.local.db.dao
 
 import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import dev.mamkin.smartstep.core.data.local.db.entity.DailyStat
@@ -22,6 +24,9 @@ interface DailyStatDao {
         epochDay: Long
     ): Flow<DailyStat>
 
-    @Update
-    fun updateStats(dailyStat: DailyStat)
+    @Query("SELECT * FROM DailyStat WHERE epochDay = :epochDay")
+    suspend fun getByDay(epochDay: Long): DailyStat?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsert(stat: DailyStat)
 }

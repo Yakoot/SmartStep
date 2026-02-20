@@ -15,7 +15,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 class HomeViewModel(
     private val userProfileRepository: UserProfileRepository,
@@ -38,7 +42,7 @@ class HomeViewModel(
             }
 
             launch {
-                stepTracker.trackSteps().collectLatest { steps ->
+                stepTracker.observeSteps().collectLatest { steps ->
                     _state.update { currentState ->
                         currentState.copy(currentSteps = steps)
                     }
@@ -75,6 +79,7 @@ class HomeViewModel(
                 _state.update { it.copy(isPhysicalActivityPermissionGranted = true) }
                 platformActionManager.startStepTrackingService()
             }
+
             PermissionStatus.NOT_DETERMINED -> _state.update { it.copy(shouldRequestPermission = true) }
             PermissionStatus.DENIED -> _state.update { it.copy(sheetType = SheetType.AFTER_FIRST_DENIAL) }
             PermissionStatus.PERMANENTLY_DENIED -> _state.update { it.copy(sheetType = SheetType.MANUAL_PERMISSION) }
@@ -161,6 +166,29 @@ class HomeViewModel(
                 updateSheetType(SheetType.NONE)
             }
 
+            HomeAction.OnEditSteps -> {
+                viewModelScope.launch {
+                    val now = Clock.System.now()
+                    val localDateTime = now.toLocalDateTime(TimeZone.currentSystemDefault())
+
+                    val todayMillis = LocalDate(
+                        year = localDateTime.year,
+                        month = localDateTime.month,
+                        day = localDateTime.day
+                    ).toEpochDays()
+
+                    stepTracker.editSteps(
+                        dateEpochMillis = todayMillis,
+                        steps = 1000
+                    )
+                }
+            }
+
+            HomeAction.OnResetTodaySteps -> {
+                viewModelScope.launch {
+                    stepTracker.resetTodaySteps()
+                }
+            }
         }
     }
 

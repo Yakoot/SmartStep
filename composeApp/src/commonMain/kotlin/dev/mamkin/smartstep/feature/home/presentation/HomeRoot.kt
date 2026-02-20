@@ -49,8 +49,10 @@ import dev.mamkin.smartstep.feature.home.presentation.components.StepsCard
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import smartstep.composeapp.generated.resources.Res
+import smartstep.composeapp.generated.resources.drawer_item_edit_steps
 import smartstep.composeapp.generated.resources.drawer_item_exit
 import smartstep.composeapp.generated.resources.drawer_item_personal_settings
+import smartstep.composeapp.generated.resources.drawer_item_reset_today_steps
 import smartstep.composeapp.generated.resources.drawer_item_step_goal
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -149,14 +151,32 @@ fun HomeRoot(
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-
                 DrawerItem(
                     title = stringResource(Res.string.drawer_item_personal_settings),
                     color = AppTheme.colors.textPrimary,
                     onClick = closeDrawerAndRun {
                         onNavigate(SmartStepGraph.ProfileSetupScreen(isInitialSetup = false))
                     }
+                )
 
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+                DrawerItem(
+                    title = stringResource(Res.string.drawer_item_edit_steps),
+                    color = AppTheme.colors.textPrimary,
+                    onClick = closeDrawerAndRun {
+                        viewModel.onAction(HomeAction.OnEditSteps)
+                    }
+                )
+
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+                DrawerItem(
+                    title = stringResource(Res.string.drawer_item_reset_today_steps),
+                    color = AppTheme.colors.textPrimary,
+                    onClick = closeDrawerAndRun {
+                        viewModel.onAction(HomeAction.OnResetTodaySteps)
+                    }
                 )
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))

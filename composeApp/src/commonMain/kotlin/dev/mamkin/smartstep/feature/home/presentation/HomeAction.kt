@@ -1,9 +1,12 @@
 package dev.mamkin.smartstep.feature.home.presentation
 
+import dev.mamkin.smartstep.app.navigation.SmartStepGraph
 import dev.mamkin.smartstep.core.presentation.utils.Permission
 
 sealed interface HomeAction {
 
+    data object OnResetTodaySteps: HomeAction
+    data object OnEditSteps: HomeAction
     data class OnSheetTypeChanged(val sheetType: SheetType) : HomeAction
     data object OnToggleExitDialogVisibility : HomeAction
     data class OnNewStepGoalSet(val stepGoal: Int) : HomeAction
