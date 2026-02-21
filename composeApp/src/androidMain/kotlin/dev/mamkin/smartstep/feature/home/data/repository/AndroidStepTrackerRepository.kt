@@ -5,19 +5,17 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import co.touchlab.kermit.Logger
 import dev.mamkin.smartstep.core.data.local.db.dao.DailyStatDao
 import dev.mamkin.smartstep.core.data.local.db.entity.DailyStat
 import dev.mamkin.smartstep.feature.home.domain.repository.StepTrackerRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import kotlin.math.min
 
 class AndroidStepTrackerRepository(
     private val context: Context,
@@ -41,6 +39,19 @@ class AndroidStepTrackerRepository(
         sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
     }
 
+    init {
+        startSensorIfNeeded()
+        loadInitialTodaySteps()
+    }
+
+    private fun loadInitialTodaySteps() {
+        scope.launch {
+            val todayEpoch = LocalDate.now().toEpochDay()
+            val todayStat = dailyStatDao.getByEpochDay(todayEpoch)
+            _steps.value = todayStat?.steps ?: 0
+        }
+    }
+
     private fun startSensorIfNeeded() {
         if (sensorStarted) return
         sensorStarted = true
@@ -51,14 +62,12 @@ class AndroidStepTrackerRepository(
         }
 
         val listener = object : SensorEventListener {
-
             override fun onSensorChanged(event: SensorEvent) {
                 val totalSteps = event.values[0].toInt()
                 lastTotalSteps = totalSteps
 
                 scope.launch {
                     val todayEpoch = LocalDate.now().toEpochDay()
-
                     val todaySteps = resolveTodaySteps(totalSteps)
 
                     val updated = DailyStat(
@@ -70,7 +79,6 @@ class AndroidStepTrackerRepository(
                     )
 
                     dailyStatDao.upsert(updated)
-
                     _steps.value = todaySteps
                 }
             }
@@ -78,11 +86,16 @@ class AndroidStepTrackerRepository(
             override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
         }
 
-        sensorManager.registerListener(
+        val registered = sensorManager.registerListener(
             listener,
             sensor,
-            SensorManager.SENSOR_DELAY_UI
+            SensorManager.SENSOR_DELAY_FASTEST
         )
+
+        if (!registered) {
+            Logger.e("Failed to register step counter sensor")
+            _steps.value = 0
+        }
     }
 
     override suspend fun resetTodaySteps() {
@@ -127,9 +140,5 @@ class AndroidStepTrackerRepository(
         }
 
         return totalSteps - baseline.totalSteps
-    }
-
-    init {
-        startSensorIfNeeded()
     }
 }

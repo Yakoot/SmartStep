@@ -29,4 +29,7 @@ interface DailyStatDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(stat: DailyStat)
+
+    @Query("SELECT * FROM dailystat WHERE epochDay = :epochDay LIMIT 1")
+    suspend fun getByEpochDay(epochDay: Long): DailyStat?
 }
