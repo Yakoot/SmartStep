@@ -38,11 +38,9 @@ fun StepGoalBottomSheet(
     onSave: (newStepGoal: Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-
     var selectedValue by remember {
         mutableStateOf(stepGoal?.toString() ?: 1000.toString())
     }
-
 
     val numberRange = remember { (1000..40000 step 100).map { it.toString() } }
 

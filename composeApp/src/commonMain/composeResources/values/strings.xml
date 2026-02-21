@@ -28,7 +28,14 @@
     <string name="drawer_item_reset_today_steps">Reset Today’s Steps</string>
     <string name="drawer_item_exit">Exit</string>
 
+    <string name="reset_steps_description">Are you sure you want to reset today ’s steps?</string>
+    <string name="reset">Reset</string>
+
+    <string name="edit_steps_title">Edit steps</string>
+    <string name="edit_steps_description">Calories, distance &amp; \n duration will be recalculated accordingly.</string>
+
     <string name="steps_card_goal">/%1$d Steps</string>
+
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
 

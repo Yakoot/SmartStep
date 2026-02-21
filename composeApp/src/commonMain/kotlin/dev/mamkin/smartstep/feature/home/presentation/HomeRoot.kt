@@ -2,7 +2,6 @@ package dev.mamkin.smartstep.feature.home.presentation
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.DrawerValue
@@ -44,8 +43,11 @@ import dev.mamkin.smartstep.core.presentation.theme.SmartStepTheme
 import dev.mamkin.smartstep.core.presentation.theme.bodyLargeMedium
 import dev.mamkin.smartstep.core.presentation.utils.Permission
 import dev.mamkin.smartstep.core.presentation.utils.rememberNewPermissionLauncher
+import dev.mamkin.smartstep.feature.home.presentation.components.EditStepsDialog
+import dev.mamkin.smartstep.feature.home.presentation.components.ResetStepsDialog
 import dev.mamkin.smartstep.feature.home.presentation.components.StepGoalBottomSheet
 import dev.mamkin.smartstep.feature.home.presentation.components.StepsCard
+import dev.mamkin.smartstep.feature.home.presentation.model.EditStepDate
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import smartstep.composeapp.generated.resources.Res
@@ -175,7 +177,7 @@ fun HomeRoot(
                     title = stringResource(Res.string.drawer_item_reset_today_steps),
                     color = AppTheme.colors.textPrimary,
                     onClick = closeDrawerAndRun {
-                        viewModel.onAction(HomeAction.OnResetTodaySteps)
+                        viewModel.onAction(HomeAction.OnResetStepsClick)
                     }
                 )
 
@@ -290,6 +292,36 @@ fun HomeScreen(
                         onDismiss = onDismiss,
                         onConfirm = {
                             onAction(HomeAction.OnBackgroundContinueClick)
+                        }
+                    )
+                }
+
+                SheetType.RESET -> {
+                    ResetStepsDialog(
+                        onDismissRequest = {
+                            onAction(HomeAction.OnDismissResetDialog)
+                        },
+                        onReset = {
+                            onAction(HomeAction.OnResetStepsConfirm)
+                        }
+                    )
+                }
+
+                SheetType.EDIT_STEPS -> {
+                    EditStepsDialog(
+                        selectedDate = state.editStepsDate,
+                        selectedSteps = state.editSteps,
+                        onDismissRequest = {
+                            onAction(HomeAction.OnStepEditCancelClick)
+                        },
+                        onDateClick = {
+                            onAction(HomeAction.OnStepEditDateClick)
+                        },
+                        onSaveClick = {
+                            onAction(HomeAction.OnStepEditSaveClick)
+                        },
+                        onStepsChange = {
+                            onAction(HomeAction.OnStepEditStepsChange(it.toIntOrNull() ?: 0))
                         }
                     )
                 }

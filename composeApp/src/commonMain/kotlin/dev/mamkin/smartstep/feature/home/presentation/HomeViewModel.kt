@@ -9,6 +9,7 @@ import dev.mamkin.smartstep.core.presentation.utils.PermissionManager
 import dev.mamkin.smartstep.core.presentation.utils.PermissionStatus
 import dev.mamkin.smartstep.core.presentation.utils.PlatformActionManager
 import dev.mamkin.smartstep.feature.home.domain.repository.StepTrackerRepository
+import dev.mamkin.smartstep.feature.home.presentation.model.EditStepDate
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,10 +17,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
-import kotlin.time.Clock
-import kotlin.time.Instant
 
 class HomeViewModel(
     private val userProfileRepository: UserProfileRepository,
@@ -167,29 +164,88 @@ class HomeViewModel(
             }
 
             HomeAction.OnEditSteps -> {
-                viewModelScope.launch {
-                    val now = Clock.System.now()
-                    val localDateTime = now.toLocalDateTime(TimeZone.currentSystemDefault())
-
-                    val todayMillis = LocalDate(
-                        year = localDateTime.year,
-                        month = localDateTime.month,
-                        day = localDateTime.day
-                    ).toEpochDays()
-
-                    stepTracker.editSteps(
-                        dateEpochMillis = todayMillis,
-                        steps = 1000
+                _state.update {
+                    it.copy(
+                        sheetType = SheetType.EDIT_STEPS
                     )
                 }
             }
 
-            HomeAction.OnResetTodaySteps -> {
+            is HomeAction.OnResetStepsConfirm -> {
                 viewModelScope.launch {
                     stepTracker.resetTodaySteps()
+
+                    _state.update {
+                        it.copy(
+                            sheetType = SheetType.NONE
+                        )
+                    }
+                }
+            }
+
+            HomeAction.OnDismissResetDialog -> {
+                _state.update {
+                    it.copy(
+                        sheetType = SheetType.NONE
+                    )
+                }
+            }
+
+            HomeAction.OnResetStepsClick -> {
+                _state.update {
+                    it.copy(
+                        sheetType = SheetType.RESET
+                    )
+                }
+            }
+
+            HomeAction.OnStepEditCancelClick -> {
+                _state.update {
+                    it.copy(
+                        sheetType = SheetType.NONE
+                    )
+                }
+            }
+
+            HomeAction.OnStepEditDateClick -> {
+
+            }
+
+            HomeAction.OnStepEditSaveClick -> {
+                viewModelScope.launch {
+                    stepTracker.editSteps(
+                        dateEpochMillis = _state.value.editStepsDate.toEpochMillis(),
+                        steps = _state.value.editSteps
+                    )
+
+                    _state.update {
+                        it.copy(
+                            sheetType = SheetType.NONE,
+                            editSteps = 0,
+                            editStepsDate = EditStepDate.today()
+                        )
+                    }
+                }
+            }
+
+            is HomeAction.OnStepEditStepsChange -> {
+                _state.update {
+                    it.copy(
+                        editSteps = action.steps
+                    )
+                }
+            }
+
+            is HomeAction.OnStepEditDateChange -> {
+                _state.update {
+                    it.copy(
+                        editStepsDate = action.date
+                    )
                 }
             }
         }
+
+
     }
 
     private suspend fun handleAllowAccessClick() {
