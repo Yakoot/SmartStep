@@ -45,6 +45,7 @@ import dev.mamkin.smartstep.core.presentation.utils.Permission
 import dev.mamkin.smartstep.core.presentation.utils.rememberNewPermissionLauncher
 import dev.mamkin.smartstep.feature.home.presentation.components.EditStepsDialog
 import dev.mamkin.smartstep.feature.home.presentation.components.ResetStepsDialog
+import dev.mamkin.smartstep.feature.home.presentation.components.SelectDateDialog
 import dev.mamkin.smartstep.feature.home.presentation.components.StepGoalBottomSheet
 import dev.mamkin.smartstep.feature.home.presentation.components.StepsCard
 import dev.mamkin.smartstep.feature.home.presentation.model.EditStepDate
@@ -218,19 +219,17 @@ fun HomeScreen(
     onDrawerOpen: () -> Unit,
     onDismiss: () -> Unit,
     onAction: (HomeAction) -> Unit,
-    modifier: Modifier = Modifier
 ) {
     Scaffold(
         topBar = {
             MainTopBar(onDrawerOpen = onDrawerOpen)
-        }, modifier = modifier,
+        },
         containerColor = AppTheme.colors.backgroundMain
     ) { paddingValues ->
         Box(
             modifier = Modifier.fillMaxSize().padding(paddingValues),
             contentAlignment = Alignment.Center
         ) {
-
             StepsCard(
                 steps = state.currentSteps,
                 goal = state.currentStepGoal ?: 5000,
@@ -238,6 +237,7 @@ fun HomeScreen(
                     .widthIn(max = 394.dp)
                     .padding(horizontal = 16.dp)
             )
+
             if (state.shouldDisplayExitDialog)
                 SettingsDialog(onDismiss = {
                     onAction(HomeAction.OnToggleExitDialogVisibility)
@@ -327,7 +327,17 @@ fun HomeScreen(
                 }
             }
 
-
+            if (state.isDatePickerDialogVisible) {
+                SelectDateDialog(
+                    initialData = state.editStepsDate,
+                    onSave = {
+                        onAction(HomeAction.OnStepEditDateChange(it))
+                    },
+                    onDismissRequest = {
+                        onAction(HomeAction.OnDatePickerCancelClick)
+                    }
+                )
+            }
         }
     }
 
@@ -360,7 +370,7 @@ fun DrawerItem(
 fun HomePreview() {
     SmartStepTheme {
         HomeScreen(
-            state= HomeState(),
+            state = HomeState(),
             sheetState = rememberModalBottomSheetState(),
             onDrawerOpen = {
 
@@ -372,13 +382,14 @@ fun HomePreview() {
         )
     }
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(widthDp = 1280)
 @Composable
 fun WideHomePreview() {
     SmartStepTheme {
         HomeScreen(
-            state= HomeState(),
+            state = HomeState(),
             sheetState = rememberModalBottomSheetState(),
             onDrawerOpen = {
 

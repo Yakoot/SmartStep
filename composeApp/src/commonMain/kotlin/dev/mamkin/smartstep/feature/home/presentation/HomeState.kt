@@ -11,6 +11,7 @@ data class HomeState(
     val shouldRequestPermission: Boolean = false,
     val editStepsDate: EditStepDate = EditStepDate.today(),
     val editSteps: Int = 0,
+    val isDatePickerDialogVisible: Boolean = false
 )
 
 

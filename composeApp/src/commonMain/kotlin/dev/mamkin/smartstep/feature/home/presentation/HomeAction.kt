@@ -15,6 +15,7 @@ sealed interface HomeAction {
     data object OnStepEditDateClick : HomeAction
     data object OnStepEditSaveClick : HomeAction
     data object OnStepEditCancelClick : HomeAction
+    data object OnDatePickerCancelClick : HomeAction
 
     data class OnSheetTypeChanged(val sheetType: SheetType) : HomeAction
     data object OnToggleExitDialogVisibility : HomeAction

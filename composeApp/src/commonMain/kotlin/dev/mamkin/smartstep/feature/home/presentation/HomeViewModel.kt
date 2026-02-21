@@ -208,7 +208,11 @@ class HomeViewModel(
             }
 
             HomeAction.OnStepEditDateClick -> {
-
+                _state.update {
+                    it.copy(
+                        isDatePickerDialogVisible = true
+                    )
+                }
             }
 
             HomeAction.OnStepEditSaveClick -> {
@@ -239,7 +243,16 @@ class HomeViewModel(
             is HomeAction.OnStepEditDateChange -> {
                 _state.update {
                     it.copy(
-                        editStepsDate = action.date
+                        editStepsDate = action.date,
+                        isDatePickerDialogVisible = false
+                    )
+                }
+            }
+
+            HomeAction.OnDatePickerCancelClick -> {
+                _state.update {
+                    it.copy(
+                        isDatePickerDialogVisible = false
                     )
                 }
             }
