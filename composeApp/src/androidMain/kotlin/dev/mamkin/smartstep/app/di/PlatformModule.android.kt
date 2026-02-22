@@ -47,7 +47,8 @@ actual val platformModule = module {
         AndroidStepTrackerRepository(
             context = androidContext(),
             baselineStorage = get(),
-            dailyStatDao = get()
+            dailyStatDao = get(),
+            userProfileRepository = get()
         )
     }
 }

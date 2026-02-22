@@ -8,7 +8,7 @@ sealed interface HomeAction {
     data object OnResetStepsClick: HomeAction
     data object OnResetStepsConfirm: HomeAction
     data object OnDismissResetDialog: HomeAction
-    data object OnEditSteps: HomeAction
+    data object OnEditStepsClick: HomeAction
 
     data class OnStepEditStepsChange(val steps: Int) : HomeAction
     data class OnStepEditDateChange(val date: EditStepDate) : HomeAction
@@ -30,5 +30,7 @@ sealed interface HomeAction {
 
     data class OnNewPermissionResult(val isGranted: Boolean) : HomeAction
     data object OnResumed: HomeAction
+
+    data object OnToggleStepTracking : HomeAction
 
 }

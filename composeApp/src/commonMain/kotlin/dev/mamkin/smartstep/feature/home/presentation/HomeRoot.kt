@@ -1,7 +1,11 @@
 package dev.mamkin.smartstep.feature.home.presentation
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.DrawerValue
@@ -43,12 +47,12 @@ import dev.mamkin.smartstep.core.presentation.theme.SmartStepTheme
 import dev.mamkin.smartstep.core.presentation.theme.bodyLargeMedium
 import dev.mamkin.smartstep.core.presentation.utils.Permission
 import dev.mamkin.smartstep.core.presentation.utils.rememberNewPermissionLauncher
+import dev.mamkin.smartstep.feature.home.presentation.components.DailyAverageCard
 import dev.mamkin.smartstep.feature.home.presentation.components.EditStepsDialog
 import dev.mamkin.smartstep.feature.home.presentation.components.ResetStepsDialog
 import dev.mamkin.smartstep.feature.home.presentation.components.SelectDateDialog
 import dev.mamkin.smartstep.feature.home.presentation.components.StepGoalBottomSheet
 import dev.mamkin.smartstep.feature.home.presentation.components.StepsCard
-import dev.mamkin.smartstep.feature.home.presentation.model.EditStepDate
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import smartstep.composeapp.generated.resources.Res
@@ -168,7 +172,7 @@ fun HomeRoot(
                     title = stringResource(Res.string.drawer_item_edit_steps),
                     color = AppTheme.colors.textPrimary,
                     onClick = closeDrawerAndRun {
-                        viewModel.onAction(HomeAction.OnEditSteps)
+                        viewModel.onAction(HomeAction.OnEditStepsClick)
                     }
                 )
 
@@ -230,21 +234,37 @@ fun HomeScreen(
             modifier = Modifier.fillMaxSize().padding(paddingValues),
             contentAlignment = Alignment.Center
         ) {
-            StepsCard(
-                steps = state.currentSteps,
-                goal = state.currentStepGoal ?: 5000,
-                modifier = Modifier
-                    .widthIn(max = 394.dp)
-                    .padding(horizontal = 16.dp)
-            )
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                state.todayStats?.let {
+                    StepsCard(
+                        stats = it,
+                        isTrackingPaused = state.isTrackingPaused,
+                        goal = state.currentStepGoal ?: 5000,
+                        onAction = onAction,
+                        modifier = Modifier
+                            .widthIn(max = 394.dp)
+                            .padding(horizontal = 16.dp)
+                    )
+                }
 
-            if (state.shouldDisplayExitDialog)
+                Spacer(Modifier.height(8.dp))
+
+                DailyAverageCard(
+                    days = state.last7Days,
+                    goalSteps = state.currentStepGoal ?: 5000,
+                )
+            }
+
+            if (state.shouldDisplayExitDialog) {
                 SettingsDialog(onDismiss = {
                     onAction(HomeAction.OnToggleExitDialogVisibility)
                     requestAppExit()
                 })
+            }
 
-            when (state.sheetType) {
+            when (state.activeSheet) {
                 SheetType.NONE -> {
                     LaunchedEffect(sheetState) {
                         if (sheetState.isVisible) {
@@ -327,7 +347,7 @@ fun HomeScreen(
                 }
             }
 
-            if (state.isDatePickerDialogVisible) {
+            if (state.shouldRequestBackgroundAccess) {
                 SelectDateDialog(
                     initialData = state.editStepsDate,
                     onSave = {

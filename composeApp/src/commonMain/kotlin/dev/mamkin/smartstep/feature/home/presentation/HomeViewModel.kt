@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.datetime.LocalDate
 
 class HomeViewModel(
     private val userProfileRepository: UserProfileRepository,
@@ -39,10 +38,13 @@ class HomeViewModel(
             }
 
             launch {
-                stepTracker.observeSteps().collectLatest { steps ->
-                    println("HVM Steps: $steps")
+                stepTracker.observeLast7Days().collectLatest { last7Days ->
                     _state.update { currentState ->
-                        currentState.copy(currentSteps = steps)
+                        currentState.copy(
+                            last7Days = last7Days,
+                            todayStats = last7Days.last().dailyStat,
+                            isTrackingPaused = stepTracker.isTrackingPaused()
+                        )
                     }
                 }
             }
@@ -61,7 +63,7 @@ class HomeViewModel(
             _state.update {
                 it.copy(
                     isPhysicalActivityPermissionGranted = true,
-                    sheetType = SheetType.BACKGROUND_ACCESS
+                    activeSheet = SheetType.BACKGROUND_ACCESS
                 )
             }
         } else if (status != PermissionStatus.GRANTED && wasGrantedBefore) {
@@ -79,8 +81,8 @@ class HomeViewModel(
             }
 
             PermissionStatus.NOT_DETERMINED -> _state.update { it.copy(shouldRequestPermission = true) }
-            PermissionStatus.DENIED -> _state.update { it.copy(sheetType = SheetType.AFTER_FIRST_DENIAL) }
-            PermissionStatus.PERMANENTLY_DENIED -> _state.update { it.copy(sheetType = SheetType.MANUAL_PERMISSION) }
+            PermissionStatus.DENIED -> _state.update { it.copy(activeSheet = SheetType.AFTER_FIRST_DENIAL) }
+            PermissionStatus.PERMANENTLY_DENIED -> _state.update { it.copy(activeSheet = SheetType.MANUAL_PERMISSION) }
         }
     }
 
@@ -91,7 +93,7 @@ class HomeViewModel(
             _state.update {
                 it.copy(
                     isPhysicalActivityPermissionGranted = true,
-                    sheetType = SheetType.BACKGROUND_ACCESS
+                    activeSheet = SheetType.BACKGROUND_ACCESS
                 )
             }
         } else {
@@ -100,9 +102,9 @@ class HomeViewModel(
                 permissionManager.getPermissionStatus(Permission.PhysicalActivityMotionSensors)
             Logger.e("NEW STATUS $newStatus")
             if (newStatus == PermissionStatus.PERMANENTLY_DENIED) {
-                _state.update { it.copy(sheetType = SheetType.MANUAL_PERMISSION) }
+                _state.update { it.copy(activeSheet = SheetType.MANUAL_PERMISSION) }
             } else {
-                _state.update { it.copy(sheetType = SheetType.AFTER_FIRST_DENIAL) }
+                _state.update { it.copy(activeSheet = SheetType.AFTER_FIRST_DENIAL) }
             }
         }
     }
@@ -164,10 +166,10 @@ class HomeViewModel(
                 updateSheetType(SheetType.NONE)
             }
 
-            HomeAction.OnEditSteps -> {
+            HomeAction.OnEditStepsClick -> {
                 _state.update {
                     it.copy(
-                        sheetType = SheetType.EDIT_STEPS
+                        activeSheet = SheetType.EDIT_STEPS
                     )
                 }
             }
@@ -178,7 +180,7 @@ class HomeViewModel(
 
                     _state.update {
                         it.copy(
-                            sheetType = SheetType.NONE
+                            activeSheet = SheetType.NONE
                         )
                     }
                 }
@@ -187,7 +189,7 @@ class HomeViewModel(
             HomeAction.OnDismissResetDialog -> {
                 _state.update {
                     it.copy(
-                        sheetType = SheetType.NONE
+                        activeSheet = SheetType.NONE
                     )
                 }
             }
@@ -195,7 +197,7 @@ class HomeViewModel(
             HomeAction.OnResetStepsClick -> {
                 _state.update {
                     it.copy(
-                        sheetType = SheetType.RESET
+                        activeSheet = SheetType.RESET
                     )
                 }
             }
@@ -203,7 +205,7 @@ class HomeViewModel(
             HomeAction.OnStepEditCancelClick -> {
                 _state.update {
                     it.copy(
-                        sheetType = SheetType.NONE
+                        activeSheet = SheetType.NONE
                     )
                 }
             }
@@ -211,8 +213,20 @@ class HomeViewModel(
             HomeAction.OnStepEditDateClick -> {
                 _state.update {
                     it.copy(
-                        isDatePickerDialogVisible = true
+                        shouldRequestBackgroundAccess = true
                     )
+                }
+            }
+
+            HomeAction.OnToggleStepTracking -> {
+                viewModelScope.launch {
+                    if (_state.value.isTrackingPaused) {
+                        stepTracker.resumeTracking()
+                        _state.update { it.copy(isTrackingPaused = false) }
+                    } else {
+                        stepTracker.pauseTracking()
+                        _state.update { it.copy(isTrackingPaused = true) }
+                    }
                 }
             }
 
@@ -225,7 +239,7 @@ class HomeViewModel(
 
                     _state.update {
                         it.copy(
-                            sheetType = SheetType.NONE,
+                            activeSheet = SheetType.NONE,
                             editSteps = 0,
                             editStepsDate = EditStepDate.today()
                         )
@@ -245,7 +259,7 @@ class HomeViewModel(
                 _state.update {
                     it.copy(
                         editStepsDate = action.date,
-                        isDatePickerDialogVisible = false
+                        shouldRequestBackgroundAccess = false
                     )
                 }
             }
@@ -253,7 +267,7 @@ class HomeViewModel(
             HomeAction.OnDatePickerCancelClick -> {
                 _state.update {
                     it.copy(
-                        isDatePickerDialogVisible = false
+                        shouldRequestBackgroundAccess = false
                     )
                 }
             }
@@ -270,7 +284,7 @@ class HomeViewModel(
                 _state.update {
                     it.copy(
                         shouldRequestPermission = true,
-                        sheetType = SheetType.NONE
+                        activeSheet = SheetType.NONE
                     )
                 }
             }
@@ -278,14 +292,14 @@ class HomeViewModel(
                   _state.update { it.copy(shouldRequestPermission = true, sheetType = SheetType.NONE) }
               }*/
             PermissionStatus.PERMANENTLY_DENIED -> {
-                _state.update { it.copy(sheetType = SheetType.MANUAL_PERMISSION) }
+                _state.update { it.copy(activeSheet = SheetType.MANUAL_PERMISSION) }
             }
 
             PermissionStatus.GRANTED -> {
                 _state.update {
                     it.copy(
                         isPhysicalActivityPermissionGranted = true,
-                        sheetType = SheetType.NONE
+                        activeSheet = SheetType.NONE
                     )
                 }
             }
@@ -302,7 +316,7 @@ class HomeViewModel(
     private fun updateSheetType(sheetType: SheetType) {
         _state.update { currentState ->
             currentState.copy(
-                sheetType = sheetType
+                activeSheet = sheetType
             )
         }
     }

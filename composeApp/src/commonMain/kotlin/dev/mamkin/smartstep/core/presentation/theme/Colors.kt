@@ -14,6 +14,7 @@ val SkyBlue = Color(0xFFE4F0FB)
 val GhostWhite = Color(0xFFF9FAFB)
 val Platinum = Color(0xFFF0F0F0)
 val Silver = Color(0xFFE5E7EB)
+val AdditionalGreen = Color(0xff0DC600)
 
 data class AppColors(
     val buttonPrimary: Color,
@@ -28,6 +29,7 @@ data class AppColors(
     val backgroundWhite: Color,
     val backgroundWhite20: Color,
     val strokeMain: Color,
+    val additionalGreen: Color,
     val material: ColorScheme
 )
 
@@ -44,6 +46,7 @@ val LightAppColors = AppColors(
     backgroundWhite = White,
     backgroundWhite20 = White.copy(alpha = 0.2f),
     strokeMain = Silver,
+    additionalGreen = AdditionalGreen,
     material = lightColorScheme(
         primary = RoyalBlue,
         onPrimary = White,

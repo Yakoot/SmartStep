@@ -56,13 +56,13 @@ class StepTrackingService : Service() {
         if (trackingJob?.isActive != true) {
             trackingJob = serviceScope.launch {
                 combine(
-                    stepTrackerRepository.observeSteps(),
+                    stepTrackerRepository.observeLast7Days(),
                     userProfileRepository.getStepGoal(),
                     userProfileRepository.getCaloriesPerStep()
                 ) { steps, stepsGoal, caloriesPerStep ->
-                    Triple(steps, stepsGoal ?: 10000, (steps * caloriesPerStep).toInt())
+                    Triple(steps, stepsGoal ?: 10000, (steps.last().steps * caloriesPerStep).toInt())
                 }.collectLatest { (steps, stepsGoal, calories) ->
-                    notificationManager.notify(NOTIFICATION_ID, buildNotification(steps, stepsGoal, calories))
+                    notificationManager.notify(NOTIFICATION_ID, buildNotification(steps.last().steps, stepsGoal, calories))
                 }
             }
         }
