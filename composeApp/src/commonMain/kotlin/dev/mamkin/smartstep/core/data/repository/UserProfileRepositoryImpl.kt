@@ -14,6 +14,7 @@ import dev.mamkin.smartstep.core.domain.model.UnitSystem
 import dev.mamkin.smartstep.core.domain.model.WeightUnit
 import dev.mamkin.smartstep.core.domain.repository.UserProfileRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
@@ -89,7 +90,6 @@ class UserProfileRepositoryImpl(
     override fun getStepGoal(): Flow<Int?> {
         return dataStore.data.map { preferences ->
             preferences[STEP_GOAL_KEY]
-
         }
     }
 
@@ -105,7 +105,20 @@ class UserProfileRepositoryImpl(
         }.first()
     }
 
+    override fun getCaloriesPerStep(): Flow<Float> {
+        return combine(getWeight(), getGender()) { weight, gender ->
+            val weightKg = weight ?: DEFAULT_WEIGHT_KG
+            val genderFactor = when (gender) {
+                Gender.Male -> 1.0f
+                Gender.Female -> 0.9f
+                null -> 1.0f
+            }
+            weightKg * 0.0005f * genderFactor
+        }
+    }
+
     private companion object Keys {
+        private const val DEFAULT_WEIGHT_KG = 65f
 
         private val HEIGHT_KEY = intPreferencesKey("PROFILE_HEIGHT")
         private val WEIGHT_KEY = floatPreferencesKey("PROFILE_WEIGHT")

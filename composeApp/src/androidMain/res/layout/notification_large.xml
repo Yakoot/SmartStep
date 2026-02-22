@@ -8,73 +8,87 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="horizontal">
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_weight="1"
+            android:layout_gravity="bottom"
+            android:orientation="vertical">
             <LinearLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:orientation="horizontal">
-                <ImageView
-                    android:layout_width="20.dp"
-                    android:layout_height="20.dp"
-                    android:src="@drawable/ic_sneakers"
-                    android:tint="@color/buttonPrimary"
-                    tools:ignore="UseAppTint"></ImageView>
-                <TextView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:textSize="16sp"
-                    android:lineHeight="24sp"
-                    android:textFontWeight="500"
-                    android:layout_marginStart="6dp"
-                    android:textColor="@color/textPrimary"
-                    tools:text="1,000"
-                    android:id="@+id/stepsCount"></TextView>
-            </LinearLayout>
+                    android:gravity="center"
+                    android:orientation="horizontal">
+                    <ImageView
+                        android:layout_width="20.dp"
+                        android:layout_height="20.dp"
+                        android:src="@drawable/ic_sneakers"
+                        android:tint="@color/buttonPrimary"
+                        tools:ignore="UseAppTint"></ImageView>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:lineHeight="24sp"
+                        android:textFontWeight="500"
+                        android:layout_marginStart="6dp"
+                        android:textColor="@color/textPrimary"
+                        tools:text="1,000"
+                        android:id="@+id/stepsCount"></TextView>
+                </LinearLayout>
 
+                <ImageView
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="#E0E0E0" />
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+                    <ImageView
+                        android:layout_width="20.dp"
+                        android:layout_height="20.dp"
+                        android:src="@drawable/ic_scales"
+                        android:tint="@color/buttonPrimary"
+                        tools:ignore="UseAppTint"></ImageView>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:lineHeight="24sp"
+                        android:textFontWeight="500"
+                        android:layout_marginStart="6dp"
+                        android:textColor="@color/textPrimary"
+                        android:text="0"
+                        tools:text="1,000"
+                        android:id="@+id/caloriesCount"></TextView>
+                </LinearLayout>
+
+
+            </LinearLayout>
             <ImageView
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:background="#E0E0E0" />
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal">
-                <ImageView
-                    android:layout_width="20.dp"
-                    android:layout_height="20.dp"
-                    android:src="@drawable/ic_scales"
-                    android:tint="@color/buttonPrimary"
-                    tools:ignore="UseAppTint"></ImageView>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="16sp"
-                    android:lineHeight="24sp"
-                    android:textFontWeight="500"
-                    android:layout_marginStart="6dp"
-                    android:textColor="@color/textPrimary"
-                    android:text="0"
-                    tools:text="1,000"
-                    android:id="@+id/caloriesCount"></TextView>
-            </LinearLayout>
-
+                android:id="@+id/progressImage"
+                android:layout_width="match_parent"
+                android:layout_height="8dp"
+                android:layout_marginTop="8dp"
+                android:scaleType="fitXY" />
 
         </LinearLayout>
         <ImageView
-            android:id="@+id/progressImage"
-            android:layout_width="match_parent"
-            android:layout_height="8dp"
-            android:layout_marginTop="8dp"
-            android:scaleType="fitXY" />
-
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:contentDescription="Go to app"
+            android:src="@drawable/ic_chevron_right"/>
     </LinearLayout>
+
 
 </LinearLayout>

@@ -3,6 +3,7 @@ package dev.mamkin.smartstep.feature.home.service
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -22,9 +23,11 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import androidx.core.graphics.createBitmap
+import dev.mamkin.smartstep.core.domain.repository.UserProfileRepository
 
 class StepTrackingService : Service() {
 
@@ -36,6 +39,7 @@ class StepTrackingService : Service() {
     }
 
     private val stepTrackerRepository: StepTrackerRepository by inject()
+    private val userProfileRepository: UserProfileRepository by inject()
     private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private var trackingJob: Job? = null
     private lateinit var notificationManager: NotificationManager
@@ -47,12 +51,18 @@ class StepTrackingService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        startForeground(NOTIFICATION_ID, buildNotification(0))
+        startForeground(NOTIFICATION_ID, buildNotification(steps = 0, stepsGoal = 10000, calories = 0))
 
         if (trackingJob?.isActive != true) {
             trackingJob = serviceScope.launch {
-                stepTrackerRepository.observeSteps().collectLatest { steps ->
-                    notificationManager.notify(NOTIFICATION_ID, buildNotification(steps))
+                combine(
+                    stepTrackerRepository.observeSteps(),
+                    userProfileRepository.getStepGoal(),
+                    userProfileRepository.getCaloriesPerStep()
+                ) { steps, stepsGoal, caloriesPerStep ->
+                    Triple(steps, stepsGoal ?: 10000, (steps * caloriesPerStep).toInt())
+                }.collectLatest { (steps, stepsGoal, calories) ->
+                    notificationManager.notify(NOTIFICATION_ID, buildNotification(steps, stepsGoal, calories))
                 }
             }
         }
@@ -79,26 +89,38 @@ class StepTrackingService : Service() {
         notificationManager.createNotificationChannel(channel)
     }
 
-    private fun buildNotification(steps: Int): Notification {
+    private fun buildNotification(steps: Int, stepsGoal: Int, calories: Int): Notification {
+        val launchIntent = packageManager.getLaunchIntentForPackage(packageName)?.apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            0,
+            launchIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
         val bitmap = createProgressBitmap(
             context = this,
             widthDp = 250,
-            steps = 3000,
-            goal = 6000,
+            steps = steps,
+            goal = stepsGoal,
             bgColor = ContextCompat.getColor(this, R.color.backgroundMain),
             indicatorColor = ContextCompat.getColor(this, R.color.buttonPrimary)
         )
         val notificationLayout = RemoteViews(packageName, R.layout.notification_small)
         notificationLayout.setTextViewText(R.id.stepsCount, steps.toString())
+        notificationLayout.setTextViewText(R.id.caloriesCount, calories.toString())
         notificationLayout.setImageViewBitmap(R.id.progressImage, bitmap)
         val notificationLayoutExpanded = RemoteViews(packageName, R.layout.notification_large)
         notificationLayoutExpanded.setTextViewText(R.id.stepsCount, steps.toString())
+        notificationLayoutExpanded.setTextViewText(R.id.caloriesCount, calories.toString())
         notificationLayoutExpanded.setImageViewBitmap(R.id.progressImage, bitmap)
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_steps)
             .setStyle(NotificationCompat.DecoratedCustomViewStyle())
             .setCustomContentView(notificationLayout)
             .setCustomBigContentView(notificationLayoutExpanded)
+            .setContentIntent(pendingIntent)
             .setOngoing(true)
             .setSilent(true)
             .build()
@@ -118,7 +140,7 @@ fun createProgressBitmap(
     val heightPx = (8 * density).toInt()
     val padding = 2 * density
     val innerHeight = 4 * density
-    val progress = steps.toFloat() / goal.toFloat()
+    val progress = (steps / goal).toFloat().coerceAtMost(1f)
 
     val bitmap = createBitmap(widthPx, heightPx)
     val canvas = Canvas(bitmap)

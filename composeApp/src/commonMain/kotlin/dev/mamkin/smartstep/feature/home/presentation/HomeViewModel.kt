@@ -40,6 +40,7 @@ class HomeViewModel(
 
             launch {
                 stepTracker.observeSteps().collectLatest { steps ->
+                    println("HVM Steps: $steps")
                     _state.update { currentState ->
                         currentState.copy(currentSteps = steps)
                     }

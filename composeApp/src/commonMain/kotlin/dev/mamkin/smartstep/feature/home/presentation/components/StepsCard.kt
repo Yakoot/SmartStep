@@ -90,7 +90,7 @@ fun StepsCard(
             ) {
                 val width = size.width
                 val height = size.height
-                val progress = steps.toFloat() / goal.toFloat()
+                val progress = (steps / goal).toFloat().coerceAtMost(1f)
                 drawRoundRect(
                     color = progressBgColor,
                     cornerRadius = CornerRadius(height)

@@ -27,4 +27,6 @@ interface UserProfileRepository {
 
     suspend fun setProfileSetupCompleted(boolean: Boolean)
     suspend fun isProfileSetupCompleted(): Boolean
+
+    fun getCaloriesPerStep(): Flow<Float>
 }
