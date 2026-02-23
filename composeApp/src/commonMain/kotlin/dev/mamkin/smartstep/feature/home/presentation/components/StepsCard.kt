@@ -55,6 +55,9 @@ import smartstep.composeapp.generated.resources.ic_time
 import smartstep.composeapp.generated.resources.ic_weight
 import smartstep.composeapp.generated.resources.location
 import smartstep.composeapp.generated.resources.steps_card_goal
+import kotlin.math.pow
+import kotlin.math.round
+import kotlin.math.roundToInt
 
 @Composable
 fun StepsCard(
@@ -112,7 +115,7 @@ fun AdditionalInfos(
     ) {
         AdditionalInfoItem(
             icon = Res.drawable.ic_location,
-            title = stats.kms.toString(),
+            title = stats.kms.roundTo(2).toString(),
             suffix = "km",
         )
 
@@ -120,7 +123,7 @@ fun AdditionalInfos(
 
         AdditionalInfoItem(
             icon = Res.drawable.ic_weight,
-            title = stats.kcal.toString(),
+            title = stats.kcal.roundTo(1).toString(),
             suffix = "kcal",
         )
 
@@ -128,7 +131,7 @@ fun AdditionalInfos(
 
         AdditionalInfoItem(
             icon = Res.drawable.ic_time,
-            title = stats.minutes.toString(),
+            title = stats.minutes.roundTo(1).toString(),
             suffix = "min",
         )
     }
@@ -300,7 +303,7 @@ private fun StepStats(
     ) {
         val width = size.width
         val height = size.height
-        val progress = (stats.steps / goal).toFloat().coerceAtMost(1f)
+        val progress = stats.steps.toFloat() / goal.toFloat()
 
         drawRoundRect(
             color = progressBgColor,
@@ -326,7 +329,7 @@ private fun Preview() {
         StepsCard(
             stats = DailyStat(
                 epochDay = 0L,
-                steps = 1,
+                steps = 1000,
                 kms = .1,
                 kcal = .1,
                 minutes = .1
@@ -338,4 +341,9 @@ private fun Preview() {
             isTrackingPaused = false
         )
     }
+}
+
+fun Double.roundTo(decimals: Int): Double {
+    val factor = 10.0.pow(decimals)
+    return round(this * factor) / factor
 }

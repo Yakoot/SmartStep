@@ -60,9 +60,9 @@ class StepTrackingService : Service() {
                     userProfileRepository.getStepGoal(),
                     userProfileRepository.getCaloriesPerStep()
                 ) { steps, stepsGoal, caloriesPerStep ->
-                    Triple(steps, stepsGoal ?: 10000, (steps.last().steps * caloriesPerStep).toInt())
+                    Triple(steps, stepsGoal ?: 10000, (steps.last().dailyStat.steps * caloriesPerStep).toInt())
                 }.collectLatest { (steps, stepsGoal, calories) ->
-                    notificationManager.notify(NOTIFICATION_ID, buildNotification(steps.last().steps, stepsGoal, calories))
+                    notificationManager.notify(NOTIFICATION_ID, buildNotification(steps.last().dailyStat.steps, stepsGoal, calories))
                 }
             }
         }

@@ -254,6 +254,9 @@ fun HomeScreen(
                 DailyAverageCard(
                     days = state.last7Days,
                     goalSteps = state.currentStepGoal ?: 5000,
+                    modifier = Modifier
+                        .widthIn(max = 394.dp)
+                        .padding(horizontal = 16.dp)
                 )
             }
 

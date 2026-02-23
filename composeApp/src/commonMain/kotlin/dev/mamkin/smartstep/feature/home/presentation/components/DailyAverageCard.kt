@@ -99,7 +99,7 @@ fun DailyAverageCard(
 }
 
 fun List<WeeklyDay>.dailyAverage(): Int {
-    return this.sumOf { it.dailyStat.steps } / this.size
+    return this.sumOf { it.dailyStat.steps } / 7
 }
 
 @Preview
