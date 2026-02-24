@@ -53,23 +53,22 @@ class HomeViewModel(
 
 
     private suspend fun checkPermissionStatusOnResume() {
-
         val status = permissionManager.getPermissionStatus(Permission.PhysicalActivityMotionSensors)
+        val dialogAlreadyShown = userProfileRepository.isBackgroundAccessDialogShown()
 
-        val wasGrantedBefore = _state.value.isPhysicalActivityPermissionGranted
-
-        if (status == PermissionStatus.GRANTED && !wasGrantedBefore) {
-
+        if (status == PermissionStatus.GRANTED && !dialogAlreadyShown) {
+            userProfileRepository.setBackgroundAccessDialogShown(true)
             _state.update {
                 it.copy(
                     isPhysicalActivityPermissionGranted = true,
                     activeSheet = SheetType.BACKGROUND_ACCESS
                 )
             }
-        } else if (status != PermissionStatus.GRANTED && wasGrantedBefore) {
+        } else if (status == PermissionStatus.GRANTED) {
+            _state.update { it.copy(isPhysicalActivityPermissionGranted = true) }
+        } else {
             _state.update { it.copy(isPhysicalActivityPermissionGranted = false) }
         }
-
     }
 
     private suspend fun checkInitialPermissionStatus() {
@@ -90,6 +89,7 @@ class HomeViewModel(
     private suspend fun handlePermissionDialogResult(isGranted: Boolean) {
         if (isGranted) {
             platformActionManager.startStepTrackingService()
+            userProfileRepository.setBackgroundAccessDialogShown(true)
             _state.update {
                 it.copy(
                     isPhysicalActivityPermissionGranted = true,

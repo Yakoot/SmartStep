@@ -29,4 +29,7 @@ interface UserProfileRepository {
     suspend fun isProfileSetupCompleted(): Boolean
 
     fun getCaloriesPerStep(): Flow<Float>
+
+    suspend fun setBackgroundAccessDialogShown(shown: Boolean)
+    suspend fun isBackgroundAccessDialogShown(): Boolean
 }

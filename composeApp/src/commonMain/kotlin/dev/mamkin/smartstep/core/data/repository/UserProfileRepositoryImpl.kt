@@ -117,6 +117,18 @@ class UserProfileRepositoryImpl(
         }
     }
 
+    override suspend fun setBackgroundAccessDialogShown(shown: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[BACKGROUND_ACCESS_DIALOG_SHOWN_KEY] = if (shown) 1 else 0
+        }
+    }
+
+    override suspend fun isBackgroundAccessDialogShown(): Boolean {
+        return dataStore.data.map { preferences ->
+            preferences[BACKGROUND_ACCESS_DIALOG_SHOWN_KEY] == 1
+        }.first()
+    }
+
     private companion object Keys {
         private const val DEFAULT_WEIGHT_KG = 65f
 
@@ -127,5 +139,6 @@ class UserProfileRepositoryImpl(
 
         private val STEP_GOAL_KEY = intPreferencesKey("PROFILE_STEP_GOAL")
         private val SETUP_COMPLETED_KEY = intPreferencesKey("PROFILE_SETUP_COMPLETED")
+        private val BACKGROUND_ACCESS_DIALOG_SHOWN_KEY = intPreferencesKey("BACKGROUND_ACCESS_DIALOG_SHOWN")
     }
 }
