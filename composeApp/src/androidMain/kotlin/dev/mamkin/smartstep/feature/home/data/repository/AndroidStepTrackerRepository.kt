@@ -34,6 +34,8 @@ class AndroidStepTrackerRepository(
     private var sensorStarted = false
     private var isPaused = false
 
+    private var justResumed = false
+
     private val sensorManager by lazy {
         context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     }
@@ -42,7 +44,41 @@ class AndroidStepTrackerRepository(
         sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
     }
 
-    private var sensorListener: SensorEventListener? = null
+    private val sensorListener = object : SensorEventListener {
+        override fun onSensorChanged(event: SensorEvent) {
+            if (isPaused) return
+
+            val totalSteps = event.values[0].toInt()
+
+            val previousLastTotal =
+                lastTotalSteps
+            lastTotalSteps = totalSteps
+
+            val wasJustResumed = justResumed
+            if (wasJustResumed) {
+                justResumed = false
+            }
+
+            scope.launch {
+                val todayEpoch = LocalDate.now().toEpochDay()
+
+                val todaySteps = if (wasJustResumed && previousLastTotal != null) {
+                    val intendedToday =
+                        resolveTodaySteps(previousLastTotal)
+                    val newBaseline =
+                        totalSteps - intendedToday
+                    baselineStorage.saveBaseline(todayEpoch, newBaseline)
+                    intendedToday
+                } else {
+                    resolveTodaySteps(totalSteps)
+                }
+
+                upsertComputedDailyStat(todayEpoch, todaySteps)
+            }
+        }
+
+        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
+    }
 
     init {
         startSensorIfNeeded()
@@ -51,23 +87,6 @@ class AndroidStepTrackerRepository(
     private fun startSensorIfNeeded() {
         if (sensorStarted || sensor == null) return
         sensorStarted = true
-
-        sensorListener = object : SensorEventListener {
-            override fun onSensorChanged(event: SensorEvent) {
-                if (isPaused) return
-
-                val totalSteps = event.values[0].toInt()
-                lastTotalSteps = totalSteps
-
-                scope.launch {
-                    val todayEpoch = LocalDate.now().toEpochDay()
-                    val todaySteps = resolveTodaySteps(totalSteps)
-                    upsertComputedDailyStat(todayEpoch, todaySteps)
-                }
-            }
-
-            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
-        }
 
         sensorManager.registerListener(
             sensorListener,
@@ -78,14 +97,18 @@ class AndroidStepTrackerRepository(
 
     override fun pauseTracking() {
         isPaused = true
+        justResumed = false
         sensorListener?.let {
             sensorManager.unregisterListener(it)
         }
     }
 
     override fun resumeTracking() {
+        if (sensor == null) return
+
         isPaused = false
-        sensorListener?.let {
+        justResumed = true
+        sensorListener.let {
             sensorManager.registerListener(
                 it,
                 sensor,
@@ -182,7 +205,8 @@ class AndroidStepTrackerRepository(
                 )
 
                 val localDate = LocalDate.ofEpochDay(epochDay)
-                val dayName = localDate.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+                val dayName =
+                    localDate.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
 
                 WeeklyDay(
                     dailyStat = dailyStat,
